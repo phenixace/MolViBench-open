@@ -1,0 +1,73 @@
+question
+Calculate the Tanimoto similarity of two molecules.
+Calculate the Dice similarity of two molecules.
+Calculate the Cosine similarity of two molecules.
+Generate the Morgan fingerprint of a molecule (radius=2).
+Generate the Morgan fingerprint of a molecule (radius=3).
+Compare the Hamming distance of two molecular fingerprints.
+Given benzene, generate all mono-substituted methyl derivatives.
+Given benzene, generate all di-substituted methyl derivatives.
+Given benzene, generate the para-substituted product.
+Given benzene, generate the ortho-substituted product.
+Given benzene, generate the meta-substituted product.
+Replace a hydrogen in benzene with chlorine to generate chlorobenzene.
+Replace the methyl group in toluene with a hydroxyl group.
+Replace the hydroxyl group in phenol with a methoxy group.
+Randomly replace one hydrogen in a molecule with fluorine.
+Randomly replace one hydrogen in a molecule with chlorine.
+Randomly replace one hydrogen in a molecule with bromine.
+Randomly replace one hydrogen in a molecule with iodine.
+Generate a 3D conformer of a molecule.
+Optimize a molecular conformer using the UFF force field.
+Optimize a molecular conformer using the MMFF94 force field.
+Calculate the energy of a 3D conformer.
+Generate multiple conformers and select the one with the lowest energy.
+Generate multiple conformers and select those with RMSD difference >0.5.
+Determine whether two molecular conformers are identical.
+Calculate the conformer RMSD.
+Calculate the conformer similarity matrix.
+Export a molecule to an SDF file.
+Export a molecule to a PDB file.
+Export a molecule to a MOL file.
+Read a molecule from an SDF file.
+Read a molecule from a PDB file.
+Read a molecule from a MOL file.
+Visualize a molecule as 3D coordinates.
+Randomly generate a valid molecule.
+Determine whether a molecule is stable (energy threshold).
+Given a molecule, randomly delete one atom.
+Given a molecule, randomly delete one side chain.
+Given a molecule, randomly swap two atoms.
+Given a molecule, randomly change the type of one bond.
+Given a molecule, randomly add a methyl group.
+Given a molecule, randomly add a hydroxyl group.
+Given a molecule, randomly add a halogen.
+Given a molecule, generate all canonicalized forms of the SMILES.
+Compare whether the canonical SMILES of two molecules are identical.
+Generate a 3D visualization model of a molecule.
+Perform PCA dimensionality reduction visualization on molecules (based on fingerprints).
+Perform t-SNE dimensionality reduction visualization on molecules (based on fingerprints).
+Perform K-means clustering on molecules (based on fingerprints).
+Calculate the pairwise similarity matrix for a set of molecules.
+Generate the MACCS Keys fingerprint of a molecule.
+Generate the RDKit topological fingerprint of a molecule.
+Generate the Atom Pair fingerprint of a molecule.
+Generate the Topological Torsion fingerprint of a molecule.
+Calculate the Maximum Common Substructure (MCS) of two molecules.
+Perform R-Group decomposition on a set of molecules sharing a common scaffold.
+Align two molecules in 2D based on their MCS and visualize the result.
+Fragment a molecule using the BRICS method.
+Fragment a molecule using the RECAP method.
+Standardize a molecule (remove salts, normalize tautomers, standardize charges).
+Convert a molecule to a PyTorch Geometric compatible graph data format.
+Given a molecule and reaction SMARTS, generate atom mapping numbers for the reaction.
+Batch-read molecules from an SDF file and compute all descriptors, outputting as a DataFrame.
+Perform UMAP dimensionality reduction visualization on a set of molecular fingerprints.
+Given a core scaffold and multiple R-group SMILES lists, enumerate all combinatorial products and return a canonical SMILES list.
+Given a query molecule and a molecule library, perform Tanimoto similarity search and return Top-K results (SMILES and similarity scores).
+Given a SMARTS pattern and a molecule library, perform substructure search and return all matching molecules with their matched atom indices.
+Convert an amino acid one-letter sequence to the corresponding linear peptide SMILES (L-amino acids, neutral form).
+Given two reactant lists and a reaction SMARTS, enumerate all possible products and return a deduplicated SMILES list.
+Cluster a set of molecules using the Butina algorithm (given a distance threshold) and return the cluster ID for each molecule.
+Compute the 2D pharmacophore fingerprint (Pharm2D fingerprint) of a molecule.
+Given a molecule and a substructure SMARTS, return all matching atom index tuples.

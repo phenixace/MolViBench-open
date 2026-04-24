@@ -1,0 +1,20 @@
+from rdkit import Chem
+from rdkit.Chem import BRICS
+
+
+def level_function(mol):
+    """使用 BRICS 方法对分子进行片段化切割。"""
+    try:
+        mol_obj = Chem.MolFromSmiles(mol)
+        if mol_obj is None:
+            return None
+        fragments = BRICS.BRICSDecompose(mol_obj)
+        return sorted(list(fragments))
+    except Exception as e:
+        print(e)
+        return None
+
+
+if __name__ == "__main__":
+    smiles = "c1ccc(NC(=O)c2ccccc2)cc1"
+    print(f"BRICS 片段: {level_function(smiles)}")

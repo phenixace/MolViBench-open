@@ -1,0 +1,73 @@
+question
+Define an alcohol to alkyl halide reaction using SMARTS.
+Define an esterification reaction (carboxylic acid + alcohol to ester) using SMARTS.
+Define an amidation reaction using SMARTS.
+Simulate the nitration of benzene.
+Simulate the sulfonation of benzene.
+Simulate the nucleophilic substitution of an alkyl halide.
+Simulate the oxidation of an alcohol to an aldehyde.
+Simulate the oxidation of an aldehyde to a carboxylic acid.
+Simulate the reduction of a carboxylic acid to an alcohol.
+Simulate the reduction of a ketone to an alcohol.
+Simulate the dehydration of an alcohol to form an alkene.
+Simulate the hydrogenation of an alkene to form an alkane.
+Simulate the halogenation of an alkene.
+Simulate the hydrogenation of an alkyne to form an alkene.
+Simulate the complete hydrogenation of an alkyne to form an alkane.
+Simulate the Friedel-Crafts alkylation of an aromatic compound.
+Simulate the Friedel-Crafts acylation of an aromatic compound.
+Simulate the Williamson synthesis of an alcohol and an alkyl halide.
+Simulate the Diels-Alder reaction of an alkene.
+Simulate the Fischer esterification of a carboxylic acid.
+Simulate the amidation of a carboxylic acid.
+Given reactants, predict the possible products.
+Given products, deduce the possible reactants.
+Determine whether a reaction is balanced.
+Determine whether a reaction is likely to occur.
+Simulate a free radical substitution reaction.
+Simulate an electrophilic substitution reaction.
+Simulate a nucleophilic addition reaction.
+Simulate an elimination reaction.
+Predict the regioselectivity of a reaction.
+Predict the stereoselectivity of a reaction.
+Given a molecule, generate all possible isomers.
+Given a molecule, generate all chiral center configurations.
+Given a molecule, generate all conformational isomers.
+Determine whether two molecules are enantiomers.
+Determine whether two molecules are diastereomers.
+Determine whether two molecules are resonance structures.
+Determine whether two molecules are tautomers.
+Determine whether two molecules are constitutional isomers.
+Randomly perturb a molecular structure (atom level).
+Randomly perturb a molecular structure (bond level).
+Randomly perturb a molecular structure (side chain level).
+Randomly perturb a molecular structure (ring level).
+Given a molecule, predict possible metabolites.
+Given a molecule, predict possible toxic substructures.
+Given a molecule, predict possible pharmacophores.
+Given a molecule, predict possible target activity.
+Given a molecule, predict whether it meets REACH environmental standards.
+Given a molecule, predict whether it passes PAINS filtering rules.
+Given a molecule, predict whether it satisfies the Rule of Three (fragment library).
+Given a product molecule, use retrosynthetic analysis to find possible precursor reactants.
+Classify a given reaction by type (nucleophilic substitution / electrophilic addition / elimination / rearrangement).
+Calculate the reaction difference fingerprint of a chemical reaction.
+Simulate adding a Boc protecting group to an amino group in a molecule.
+Simulate removing a Boc protecting group from a molecule.
+Perform scaffold hopping: retain molecular side chains and replace the core scaffold with a given new scaffold.
+Identify the Matched Molecular Pair (MMP) transformation between two molecules.
+Predict whether a molecule can cross the blood-brain barrier (BBB) based on a SMARTS rule set.
+Predict whether a molecule is a CYP450 enzyme inhibitor based on substructure rules.
+Simulate a Suzuki coupling reaction (aryl halide + aryl boronic acid).
+Simulate a Click Chemistry (azide-alkyne cycloaddition) reaction.
+Simulate a Buchwald-Hartwig amination reaction.
+Generate multiple 3D conformers of a macrocyclic molecule and evaluate ring strain.
+Simulate Michael addition of a covalent inhibitor (acrylamide warhead) with cysteine.
+Detect whether a molecule triggers Brenk structural alerts and list all matched alert names.
+Detect whether a molecule contains substructure patterns associated with hERG cardiac toxicity risk.
+Detect whether a molecule contains Ames mutagenicity structural alerts.
+Detect whether a molecule triggers NIH MLSMR structural alerts (extended PAINS).
+Apply multiple filter rules (Veber + Ghose + Egan) to a molecule and output the pass/fail result for each rule.
+Calculate the 2D pharmacophore fingerprint similarity between two molecules.
+Given a set of molecules, perform train/test split based on Murcko scaffolds (with a specified random seed) and return the split result.
+Given a set of generated SMILES, compute their validity, uniqueness, and novelty metrics.

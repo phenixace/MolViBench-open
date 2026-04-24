@@ -1,0 +1,6 @@
+rdkit
+numpy
+pandas
+scikit-learn
+matplotlib
+selfies

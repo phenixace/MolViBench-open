@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.venv/
+venv/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Benchmark artifacts (do not version)
+results/
+predictions/
+outputs/
+runs/
+logs/
+
+# Common molecule output artifacts (keep only if small fixed tests)
+*.sdf
+*.mol
+*.pdb
+*.mae
+
+# Large third-party datasets (do not version)
+data/zinc250k/
+
+# Model checkpoints / binaries
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.onnx
+*.pkl
+*.joblib
+

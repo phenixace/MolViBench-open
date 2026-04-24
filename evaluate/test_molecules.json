@@ -1,0 +1,243 @@
+{
+  "_meta": {
+    "source": "ZINC250K (zinc250k_selfies.csv)",
+    "seed": 42,
+    "n_singles": 20,
+    "n_pairs": 10,
+    "n_library": 30,
+    "n_generated": 20
+  },
+  "singles": [
+    "CC(=O)NNC(=O)CSC[C@@H]([NH3+])C(=O)[O-]",
+    "CCOC(=O)c1cnc(S[C@H](CC)C(=O)[O-])nc1N",
+    "O=C(c1ccccn1)N1CCC(C(=O)N2C[C@H]3C[C@H](O)[C@H](O)C[C@H]3C2)CC1",
+    "Cc1cccc(NC(=O)C[NH+]2CCN(CC(=O)N3C[C@H](C)C[C@@H](C)C3)CC2)c1C",
+    "Cc1cc(C)cc(C(=O)N[C@H]2C(=O)N3C(C(=O)[O-])=C(CSc4nnc(C)s4)CS[C@H]23)c1",
+    "O=C(/C=C/C1CC1)NCCC[NH+]1CCN(c2ccccc2Cl)CC1",
+    "CCc1nc2n(n1)CCC[C@H]2[NH2+]Cc1cnn(-c2ccc(F)cc2)c1",
+    "O=C(c1cn(CCN2CCOCC2)nn1)N1CCCC[C@@H]1c1nc2ccc(F)cc2[nH]1",
+    "COc1cc(Cl)ccc1C(=O)NNC(=O)c1ccc(C=O)cc1",
+    "CCc1noc(CC)c1CNc1cc(Cl)nc(N)n1",
+    "CCc1ccc(CCNC(=O)N2C[C@@H](C)O[C@H](C)C2)cc1",
+    "O=C(N/N=C\\c1ccc(I)o1)c1ccc(F)cc1",
+    "Cc1nn([C@H]2CCS(=O)(=O)C2)c(C)c1CC(=O)Nc1nc2c(C)cccc2s1",
+    "Cc1nc(-c2cccc(C[NH2+][C@@H](C)c3ccc4ccccc4n3)c2)n[nH]1",
+    "C[C@H](OC(=O)c1ccccn1)C(=O)Nc1ncc(C(F)(F)F)cc1Cl",
+    "O=C(CN[C@H](C1CCCC1)C(F)(F)F)N1CCC[C@H](C(F)(F)F)C1",
+    "Cc1cc(C)c(C#N)c(S[C@@H](C)CCCl)n1",
+    "C[C@H](NC(=O)Nc1ccccc1CC(N)=O)c1ccc(Cl)cc1Cl",
+    "Cc1csc2nc(CSCc3ccccc3Cl)cc(=O)n12",
+    "CC(C)c1nccn1Cc1cccc(NC(=O)N[C@@](C)(CO)C2CCCCC2)c1"
+  ],
+  "pairs": [
+    [
+      "CC(=O)NNC(=O)CSC[C@@H]([NH3+])C(=O)[O-]",
+      "CCOC(=O)c1cnc(S[C@H](CC)C(=O)[O-])nc1N"
+    ],
+    [
+      "O=C(c1ccccn1)N1CCC(C(=O)N2C[C@H]3C[C@H](O)[C@H](O)C[C@H]3C2)CC1",
+      "Cc1cccc(NC(=O)C[NH+]2CCN(CC(=O)N3C[C@H](C)C[C@@H](C)C3)CC2)c1C"
+    ],
+    [
+      "Cc1cc(C)cc(C(=O)N[C@H]2C(=O)N3C(C(=O)[O-])=C(CSc4nnc(C)s4)CS[C@H]23)c1",
+      "O=C(/C=C/C1CC1)NCCC[NH+]1CCN(c2ccccc2Cl)CC1"
+    ],
+    [
+      "CCc1nc2n(n1)CCC[C@H]2[NH2+]Cc1cnn(-c2ccc(F)cc2)c1",
+      "O=C(c1cn(CCN2CCOCC2)nn1)N1CCCC[C@@H]1c1nc2ccc(F)cc2[nH]1"
+    ],
+    [
+      "COc1cc(Cl)ccc1C(=O)NNC(=O)c1ccc(C=O)cc1",
+      "CCc1noc(CC)c1CNc1cc(Cl)nc(N)n1"
+    ],
+    [
+      "CCc1ccc(CCNC(=O)N2C[C@@H](C)O[C@H](C)C2)cc1",
+      "O=C(N/N=C\\c1ccc(I)o1)c1ccc(F)cc1"
+    ],
+    [
+      "Cc1nn([C@H]2CCS(=O)(=O)C2)c(C)c1CC(=O)Nc1nc2c(C)cccc2s1",
+      "Cc1nc(-c2cccc(C[NH2+][C@@H](C)c3ccc4ccccc4n3)c2)n[nH]1"
+    ],
+    [
+      "C[C@H](OC(=O)c1ccccn1)C(=O)Nc1ncc(C(F)(F)F)cc1Cl",
+      "O=C(CN[C@H](C1CCCC1)C(F)(F)F)N1CCC[C@H](C(F)(F)F)C1"
+    ],
+    [
+      "Cc1cc(C)c(C#N)c(S[C@@H](C)CCCl)n1",
+      "C[C@H](NC(=O)Nc1ccccc1CC(N)=O)c1ccc(Cl)cc1Cl"
+    ],
+    [
+      "Cc1csc2nc(CSCc3ccccc3Cl)cc(=O)n12",
+      "CC(C)c1nccn1Cc1cccc(NC(=O)N[C@@](C)(CO)C2CCCCC2)c1"
+    ]
+  ],
+  "library": [
+    "N/C(=[NH+]\\NC(=O)c1ccncc1)c1cc2c(ccc3ccccc32)oc1=O",
+    "CCn1nnc2cc(C(=O)Oc3ccc(-n4cnnn4)cc3)ccc21",
+    "Cn1nnnc1SCC(=O)Oc1ccc(F)cc1",
+    "Cc1nn2c(NCc3ccccn3)cc(C(C)(C)C)nc2c1-c1ccccc1",
+    "O=C(NNc1nc2c(F)cc(F)cc2s1)c1ccc(S(=O)(=O)N2CCCCC2)cc1",
+    "CCCNC(=O)[C@H](C)NC(=O)[C@@](C)([NH3+])CC",
+    "Cc1oc(-c2ccccc2)nc1COC(=O)c1cncc(Br)c1",
+    "O[C@H](CNCc1ccc(-c2ccc(Br)cc2)o1)c1ccccc1",
+    "CC(=O)Nc1cc(NC(=O)/C=C/c2ccc(-n3ccnc3)cc2)ccc1C",
+    "COc1cc(C)c(NC(=O)/C=C/c2c(C)nn(CC(C)C)c2Cl)cc1OC",
+    "Cc1ccc([C@H](C)[NH2+]Cc2ccc(OCc3cccnc3)cc2)cc1",
+    "COc1cc(Br)c(S(=O)(=O)Nc2ccc(N3CCCC3=O)cc2)cc1OC",
+    "NC(=O)c1cccc(CCNC(=O)NCCC2CCCC2)c1",
+    "CCCNC(=O)CN(C)c1ccc([C@H](C)O)c(O)c1",
+    "Oc1ccc(CNc2nccs2)c(O)c1",
+    "CCOc1c(F)cccc1C(=O)Nc1ccccc1-n1cccn1",
+    "CCCn1ccnc1C[C@@H]([NH3+])CSc1ccc(Br)cc1",
+    "FC(F)(F)C1=CC(c2ccccc2)=NCC[NH2+]1",
+    "CCNC(=O)c1ccc(N2CC[C@@H](CC(=O)[O-])C2)nn1",
+    "Cc1ccc(C(=O)N(CC(=O)Nc2cccc(C)c2C)C[C@H]2CCCO2)cc1",
+    "CC(C)CCO[C@H]1CC[NH+]([C@@H](C)C(=O)Nc2cccc(F)c2)C1",
+    "Cc1nc(CC(=O)C(C)(C)c2ccccc2)sc1C",
+    "CCc1ccc([C@H](C[NH+]2C[C@@H](C)[C@H](C)C2)NC)cc1",
+    "O=C(C1CCN(c2ncccn2)CC1)N1CCCCCC1",
+    "CC[S@](=O)CC(=O)Nc1c(C(C)C)cccc1C(C)C",
+    "CC(C)(C)c1csc(C[C@H](C(=O)[O-])c2ccccc2Cl)n1",
+    "CCc1cnc(N2CCC([NH+]3CCC[C@@H](C(=O)N4CCCC4)C3)CC2)nc1",
+    "NS(=O)(=O)c1ccc(Cl)c(C(=O)N2CCOCC2)c1",
+    "Cc1cccc(NC(=O)CNS(=O)(=O)c2ccccc2)c1",
+    "CC(=O)NCc1ccc(C(=O)N2CCN(c3ncccc3F)CC2)s1"
+  ],
+  "activities": [
+    4.8727,
+    7.7536,
+    6.66,
+    5.9933,
+    3.7801,
+    3.78,
+    3.2904,
+    7.3309,
+    6.0056,
+    6.5404,
+    3.1029,
+    7.8495,
+    7.1622,
+    4.0617,
+    3.9091,
+    3.917,
+    4.5212,
+    5.6238,
+    5.1597,
+    4.4561,
+    6.0593,
+    3.6975,
+    4.4607,
+    4.8318,
+    5.2803,
+    6.9259,
+    3.9984,
+    5.5712,
+    5.9621,
+    3.2323
+  ],
+  "labels": [
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "generated": [
+    "C[C@@H](CNC(=O)c1cccc(NC(=O)C2CC2)c1)Oc1ccc(F)cc1",
+    "CCc1nn(C)c(N2CCC[C@H](Nc3ccccc3)C2)c1[N+](=O)[O-]",
+    "Cc1c(C(=O)O[C@H](CC(C)C)c2ccccn2)cnn1C(C)C",
+    "Cc1ccccc1-c1nc2ccccc2n1C[C@@H](C)O",
+    "CC1(C)[C@@H](C(=O)Nc2ccc(NC(=O)C3CCC3)cc2)[C@H]1C(=O)[O-]",
+    "CC1(C)[C@@H](C(=O)Nc2ccc(NC(=O)C3CCC3)cc2)[C@H]1C(=O)[O-]",
+    "Cc1ccccc1NC(=O)/C=C/c1ccc(Br)s1",
+    "invalid_smiles",
+    "C[C@H]1C[C@@H](C)C[NH+](Cc2ccccc2CNC(=O)[C@@H]2CCS(=O)(=O)C2)C1",
+    "CCCNC(=O)[C@@]1(Cc2ccccc2-c2cccc(C)c2)CCN(C(=O)c2ccncc2)C1",
+    "COCCC[NH+]1CC[C@@H](CNc2nnc(C)o2)C1",
+    "COc1ccc(OC)c(N2C(=O)NC(=O)/C(=C/c3cc(Br)c(O)c(OC)c3)C2=O)c1",
+    "C[C@H]1C=N[C@H](NC(=O)[C@@H]2CCCN(C(=O)CCC3=c4ccccc4=[NH+]C3)C2)S1",
+    "O=C(CN1CCCCCC1=O)Nc1cccc(-c2ccn[nH]2)c1",
+    "COc1ccc([C@@H](NC(=O)N2CCc3ccc(C)cc32)C2CCOCC2)cc1",
+    "C(C)(C)(C)(C)C",
+    "O=[N+]([O-])/N=c1/nc(N2CCC[NH2+]CC2)cc(-c2ccccn2)[n-]1",
+    "CC1CCN(/C(N)=[NH+]/Cc2ccc([S@@](C)=O)cc2)CC1",
+    "",
+    "O=C(Nc1ccnn1C1CCCC1)c1cc(Br)c[nH]1"
+  ],
+  "special": {
+    "substructure_smarts": [
+      "[OH]",
+      "c1ccccc1",
+      "[NH2]",
+      "C(=O)O",
+      "[F,Cl,Br,I]"
+    ],
+    "reaction_smarts": {
+      "amide_coupling": "[C:1](=O)[OH].[N:2]>>[C:1](=O)[N:2]",
+      "ester_hydrolysis": "[C:1](=O)[O:2][C:3]>>[C:1](=O)O.[O:2][C:3]",
+      "suzuki": "[c:1][Br].[c:2][B](O)O>>[c:1][c:2]"
+    },
+    "rgroup_lists": [
+      [
+        "F",
+        "Cl",
+        "Br",
+        "C",
+        "O",
+        "N"
+      ],
+      [
+        "C(=O)O",
+        "C(=O)N",
+        "C#N",
+        "C(F)(F)F",
+        "OC",
+        "CC"
+      ]
+    ],
+    "peptide_sequences": [
+      "ACDEFG",
+      "GGAA",
+      "KRH",
+      "WYFM",
+      "LIVP"
+    ],
+    "pharmacophore_smarts": [
+      "[OH]",
+      "[NH2]",
+      "c1ccccc1",
+      "[#7]",
+      "[C;X4]"
+    ],
+    "salt_smiles": [
+      "[Na+].OC(=O)c1ccccc1",
+      "[Cl-].[NH3+]c1ccccc1",
+      "CC(C)Cc1ccc(C(C)C(=O)[O-])cc1.[Na+]"
+    ]
+  }
+}

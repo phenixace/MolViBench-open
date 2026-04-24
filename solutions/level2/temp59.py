@@ -1,0 +1,22 @@
+from rdkit import Chem
+from rdkit.Chem import Recap
+
+
+def level_function(mol):
+    """使用 RECAP 方法对分子进行片段化切割。"""
+    try:
+        mol_obj = Chem.MolFromSmiles(mol)
+        if mol_obj is None:
+            return None
+        tree = Recap.RecapDecompose(mol_obj)
+        leaves = tree.GetLeaves()
+        fragments = sorted(list(leaves.keys()))
+        return fragments
+    except Exception as e:
+        print(e)
+        return None
+
+
+if __name__ == "__main__":
+    smiles = "c1ccc(NC(=O)c2ccccc2)cc1"
+    print(f"RECAP 片段: {level_function(smiles)}")

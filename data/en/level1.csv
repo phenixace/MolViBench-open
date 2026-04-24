@@ -1,0 +1,76 @@
+question
+Calculate the molecular weight of a given molecule.
+Calculate the molecular formula of a given molecule.
+Calculate the LogP value of a given molecule.
+Calculate the number of hydrogen bond donors of a molecule.
+Calculate the number of hydrogen bond acceptors of a molecule.
+Determine whether a molecule contains an aromatic ring.
+Determine whether a molecule contains a hydroxyl group (-OH).
+Determine whether a molecule contains a carboxyl group (-COOH).
+Determine whether a molecule contains an amino group (-NH2).
+Determine whether a molecule contains halogen atoms.
+Extract the topological polar surface area (TPSA) of a molecule.
+Output the canonical SMILES of a molecule.
+Output the InChI representation of a molecule.
+Visualize a molecule as a 2D SVG.
+Get the number of atoms in a molecule.
+Get the number of bonds in a molecule.
+Get the number of rings in a molecule.
+Determine whether a molecule contains a six-membered ring.
+Determine whether a molecule contains a five-membered ring.
+Determine whether a molecule contains a heterocyclic ring.
+Output all atom symbols in a molecule.
+Output all bond types in a molecule.
+Determine whether a molecule is charged.
+Calculate the number of rotatable bonds in a molecule.
+Calculate the number of possible stereocenters in a molecule.
+Determine whether a molecule satisfies Lipinski's Rule of Five.
+Calculate the QED value (drug-likeness score) of a molecule.
+Output the molar refractivity of a molecule.
+Get the distribution of valence electrons for atoms in a molecule.
+Determine whether a molecule is chiral.
+Convert a molecule to an adjacency matrix.
+Convert a molecule to an atom feature matrix.
+Convert a molecule to molblock format.
+Determine whether two SMILES are equivalent.
+Check whether a molecular SMILES is valid.
+Determine whether two molecules are constitutional isomers (ignoring stereoisomerism).
+Extract substructure match coordinates from a molecule.
+Given a SMARTS pattern, determine whether it matches.
+Determine whether a molecule contains an aromatic nitrogen.
+Determine whether a molecule contains a sulfur atom.
+Determine whether a molecule contains a phosphorus atom.
+Determine whether a molecule contains a metal element.
+Get the list of functional groups in a molecule (hydroxyl, amino, carboxyl, aldehyde, ketone, ester, halogen, aromatic ring, phosphine, sulfonyl).
+Count the number of oxygen atoms in a molecule.
+Count the number of nitrogen atoms in a molecule.
+Count the number of carbon atoms in a molecule.
+Count the number of sulfur atoms in a molecule.
+Count the number of halogen atoms in a molecule.
+Count the number of hydrogen atoms in a molecule.
+Determine whether two molecules are constitutional isomers.
+Convert a molecule's SMILES to its SELFIES representation.
+Extract the largest organic fragment from a salt-containing SMILES (e.g. [Na+].[Cl-].CCO).
+Output the R/S absolute configuration of all chiral centers in a molecule.
+Output the E/Z configuration of all double bonds in a molecule.
+Calculate the exact molecular weight of a deuterium-labeled molecule.
+Extract the Murcko scaffold of a molecule.
+Calculate the Gasteiger partial charge for each atom in a molecule.
+Calculate the BertzCT complexity index of a molecule.
+Calculate the Balaban J index of a molecule.
+Determine whether a molecule is a macrocycle (contains a ring with ≥12 members).
+Validate an invalid SMILES input and return a meaningful error message.
+Output the SMARTS pattern representation of a molecule.
+Get the hybridization type (sp/sp2/sp3) of each atom in a molecule.
+Calculate the Labute approximate surface area (ASA) of a molecule.
+Calculate the atom-wise Crippen contribution decomposition for molecular refractivity (MR).
+Calculate the synthetic accessibility score (SA Score) of a molecule.
+Calculate the Fsp3 value (fraction of sp3-hybridized carbon atoms among all carbon atoms) of a molecule.
+Calculate the heavy atom count (number of non-hydrogen atoms) of a molecule.
+Calculate the fraction of aromatic atoms relative to total heavy atoms in a molecule.
+Calculate the number of aliphatic rings in a molecule.
+Calculate the number of aromatic rings in a molecule.
+Determine whether a molecule satisfies Veber's rules (rotatable bonds <=10 AND TPSA <=140).
+Determine whether a molecule satisfies the Ghose filter (160<=MW<=480 AND -0.4<=LogP<=5.6 AND 40<=atom count<=480 AND 20<=MR<=130).
+Calculate the total count of NH and OH groups (NHOHCount) in a molecule.
+Calculate the total count of nitrogen and oxygen atoms (NOCount) in a molecule.
