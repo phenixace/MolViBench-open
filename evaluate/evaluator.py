@@ -1,5 +1,5 @@
 """
-RDKitBench Evaluation Framework
+MolViBench Evaluation Framework
 ================================
 
 Core evaluator: orchestrates the full evaluation pipeline.
@@ -550,7 +550,7 @@ def evaluate_level(level: int, config: EvalConfig) -> dict:
 def evaluate_all(config: EvalConfig) -> dict:
     """Run evaluation across all levels."""
     print("=" * 60)
-    print("  RDKitBench Evaluation")
+    print("  MolViBench Evaluation")
     print(f"  Language: {config.lang} | Safe mode: {config.safe_mode}")
     print(f"  Test molecules per question: {config.n_test_molecules}")
     print("=" * 60)

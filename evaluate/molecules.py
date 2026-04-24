@@ -1,5 +1,5 @@
 """
-RDKitBench Evaluation Framework
+MolViBench Evaluation Framework
 ================================
 
 Standard test molecule sets for benchmarking.

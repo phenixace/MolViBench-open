@@ -1,5 +1,5 @@
 """
-RDKitBench Evaluation Framework
+MolViBench Evaluation Framework
 ================================
 
 Prompt templates for querying LLMs.

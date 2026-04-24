@@ -55,6 +55,27 @@ python test.py --level 1 --question 5 --lang cn
 - Dataset description: `data/readme.md`
 - Croissant metadata: `croissant.json`
 
+## Inference
+
+Three paradigms for querying LLMs (all support OpenAI-compatible APIs):
+
+| Script | Paradigm | Description |
+|--------|----------|-------------|
+| `inference_dg.py` | Direct Generation (DG) | Single-pass: task → code |
+| `inference_sr.py` | Self-Repair (SR) | Iterative: task → code → execute → error feedback → fix (up to N rounds) |
+| `inference_ac.py` | Agent Collaboration (AC) | Two-agent: Coder generates code, Tester designs tests & judges correctness |
+
+```bash
+# DG — direct generation
+python inference_dg.py --base-url https://api.openai.com/v1 --api-key sk-xxx --model gpt-4o
+
+# SR — self-repair (3 rounds)
+python inference_sr.py --base-url https://api.openai.com/v1 --api-key sk-xxx --model gpt-4o --max-rounds 3
+
+# AC — agent collaboration
+python inference_ac.py --base-url https://api.openai.com/v1 --api-key sk-xxx --model gpt-4o
+```
+
 ## Citation
 
 If you use MolViBench in your research, please cite:

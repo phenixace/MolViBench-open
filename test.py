@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-RDKitBench — Molecular Vibe Coding Benchmark
+MolViBench — Molecular Vibe Coding Benchmark
 =============================================
 
 Main entry point for evaluation.
@@ -254,7 +254,7 @@ def cmd_generate_ground_truth(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="RDKitBench — Molecular Vibe Coding Benchmark Evaluation",
+        description="MolViBench — Molecular Vibe Coding Benchmark Evaluation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

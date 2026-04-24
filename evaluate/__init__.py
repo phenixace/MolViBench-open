@@ -1,5 +1,5 @@
 """
-RDKitBench Evaluation Framework
+MolViBench Evaluation Framework
 """
 
 from .evaluator import EvalConfig, evaluate_all, evaluate_level, evaluate_single, save_report
