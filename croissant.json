@@ -33,6 +33,7 @@
     "md5": "cr:md5",
     "parentField": "cr:parentField",
     "path": "cr:path",
+    "prov": "http://www.w3.org/ns/prov#",
     "recordSet": "cr:recordSet",
     "references": "cr:references",
     "regex": "cr:regex",
@@ -46,14 +47,70 @@
   },
   "@type": "sc:Dataset",
   "name": "MolViBench",
-  "description": "MolViBench is a molecular vibe coding benchmark containing 358 bilingual (Chinese/English) programming tasks across 5 difficulty levels for evaluating LLMs on generating executable RDKit-based code from natural-language chemistry tasks.",
-  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "description": "MolViBench is a molecular vibe coding benchmark containing 358 bilingual (Chinese/English) programming tasks across 5 difficulty levels for evaluating LLMs on generating executable RDKit-based code from natural-language chemistry tasks. Tasks span molecular property calculation, structural transformation, chemical reasoning, multi-step inference, and end-to-end molecular discovery pipelines.",
+  "conformsTo": "http://mlcommons.org/croissant/1.1",
+  "dct:conformsTo": "http://mlcommons.org/croissant/RAI/1.0",
   "citeAs": "@inproceedings{molvibench2025, title={MolViBench: A Molecular Vibe Coding Benchmark for Evaluating LLMs}, booktitle={NeurIPS 2025 Datasets and Benchmarks Track}, year={2025}}",
   "license": "https://opensource.org/licenses/MIT",
   "url": "https://github.com/phenixace/MolViBench-open",
   "version": "1.0.0",
   "datePublished": "2025-06-01",
   "inLanguage": ["en", "zh"],
+
+  "rai:dataLimitations": [
+    "Tasks are restricted to the RDKit cheminformatics library; solutions using other toolkits (e.g. OpenBabel, CDK) are not evaluated.",
+    "All tasks assume valid SMILES input unless explicitly testing error handling; real-world molecular data may contain non-standard representations.",
+    "The benchmark evaluates code generation correctness, not computational efficiency or scalability to large molecular databases.",
+    "Level 5 generative tasks (molecular discovery/optimization) have stochastic outputs; evaluation uses similarity thresholds rather than exact matching.",
+    "Not recommended for evaluating LLMs on wet-lab experimental design, reaction prediction, or protein-related tasks."
+  ],
+  "rai:dataBiases": [
+    "Task distribution is skewed toward drug-like small molecules (MW < 900 Da); macromolecules, polymers, and inorganic compounds are underrepresented.",
+    "Test molecules are primarily sourced from ZINC250K, which overrepresents commercially available drug-like compounds and underrepresents natural products and agrochemicals.",
+    "Chinese and English task descriptions are parallel translations; cultural or domain-specific phrasing differences may introduce slight difficulty variation across languages."
+  ],
+  "rai:personalSensitiveInformation": [
+    "This dataset contains no personal or sensitive information. All data consists of molecular structures (SMILES strings) and programming task descriptions. No human subjects, demographic data, or personally identifiable information is involved."
+  ],
+  "rai:dataUseCases": [
+    "Benchmarking LLMs on domain-specific code generation for cheminformatics.",
+    "Evaluating the effect of different prompting strategies (direct generation, self-repair, agent collaboration) on molecular coding tasks.",
+    "Comparing bilingual (Chinese/English) performance of LLMs on scientific programming.",
+    "Validity has been established for evaluating code correctness via deterministic execution against reference solutions with stratified test molecules."
+  ],
+  "rai:dataSocialImpact": "MolViBench aims to accelerate AI-assisted drug discovery and molecular science by providing a standardized evaluation of LLM coding capabilities. Positive impacts include lowering the barrier for researchers to leverage computational chemistry tools. Potential risks include over-reliance on LLM-generated code without expert review in safety-critical pharmaceutical applications. We mitigate this by emphasizing that the benchmark evaluates code correctness, not chemical validity of results.",
+  "rai:hasSyntheticData": false,
+
+  "prov:wasDerivedFrom": [
+    {
+      "@id": "zinc250k",
+      "@type": "sc:Dataset",
+      "name": "ZINC250K",
+      "url": "https://zinc15.docking.org/",
+      "citation": "Irwin, J.J. and Shoichet, B.K. ZINC - A Free Database of Commercially Available Compounds for Virtual Screening. J. Chem. Inf. Model. 2005, 45(1), 177-182.",
+      "datePublished": "2005-01-01",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "version": "15"
+    }
+  ],
+  "prov:wasGeneratedBy": [
+    {
+      "@type": "prov:Activity",
+      "name": "Task Design",
+      "description": "358 tasks were manually designed by domain experts in cheminformatics, organized into 5 difficulty levels following Bloom's taxonomy (Remember/Understand, Apply, Analyze, Analyze/Evaluate, Create). Each task was independently verified to have a deterministic reference solution."
+    },
+    {
+      "@type": "prov:Activity",
+      "name": "Reference Solution Development",
+      "description": "Reference solutions were written in Python using RDKit and validated against stratified test molecules sampled from ZINC250K. All solutions pass automated execution tests."
+    },
+    {
+      "@type": "prov:Activity",
+      "name": "Bilingual Translation",
+      "description": "Task descriptions were authored in Chinese and translated to English (or vice versa) by bilingual domain experts. Translations were cross-checked for technical accuracy."
+    }
+  ],
+
   "distribution": [
     {
       "@type": "cr:FileObject",
