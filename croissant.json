@@ -46,20 +46,12 @@
   },
   "@type": "sc:Dataset",
   "name": "MolViBench",
-  "description": "MolViBench is a molecular vibe coding benchmark containing 358 bilingual (Chinese/English) programming tasks across 5 difficulty levels for evaluating LLMs on generating executable RDKit-based code from natural-language chemistry tasks. Tasks span molecular property calculation, structural transformation, chemical reasoning, multi-step inference, and end-to-end molecular discovery pipelines.",
+  "description": "MolViBench is a molecular vibe coding benchmark containing 358 bilingual (Chinese/English) programming tasks across 5 difficulty levels for evaluating LLMs on generating executable RDKit-based code from natural-language chemistry tasks.",
   "conformsTo": "http://mlcommons.org/croissant/1.0",
-  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "citeAs": "@inproceedings{molvibench2025, title={MolViBench: A Molecular Vibe Coding Benchmark for Evaluating LLMs}, booktitle={NeurIPS 2025 Datasets and Benchmarks Track}, year={2025}}",
+  "license": "https://opensource.org/licenses/MIT",
   "url": "https://github.com/phenixace/MolViBench-open",
   "version": "1.0.0",
-  "keywords": [
-    "molecular computing",
-    "cheminformatics",
-    "RDKit",
-    "LLM evaluation",
-    "code generation",
-    "benchmark",
-    "vibe coding"
-  ],
   "datePublished": "2025-06-01",
   "inLanguage": ["en", "zh"],
   "distribution": [
@@ -69,7 +61,8 @@
       "name": "en/level1.csv",
       "description": "Level 1 English tasks: molecular representation and property calculation (75 tasks).",
       "contentUrl": "data/en/level1.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "md5": "4dfc3fc83da29e9902c4897315b748cd"
     },
     {
       "@type": "cr:FileObject",
@@ -77,7 +70,8 @@
       "name": "en/level2.csv",
       "description": "Level 2 English tasks: molecular transformation and similarity (72 tasks).",
       "contentUrl": "data/en/level2.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "md5": "616eb6f54f027c528225de6b688dd2b1"
     },
     {
       "@type": "cr:FileObject",
@@ -85,7 +79,8 @@
       "name": "en/level3.csv",
       "description": "Level 3 English tasks: reasoning and complex operations (72 tasks).",
       "contentUrl": "data/en/level3.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "md5": "a671551fbd1b32835b6616081074d610"
     },
     {
       "@type": "cr:FileObject",
@@ -93,7 +88,8 @@
       "name": "en/level4.csv",
       "description": "Level 4 English tasks: multi-step reasoning (75 tasks).",
       "contentUrl": "data/en/level4.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "md5": "da2f49df7cf2237bc3fca4cdcd13768a"
     },
     {
       "@type": "cr:FileObject",
@@ -101,63 +97,53 @@
       "name": "en/level5.csv",
       "description": "Level 5 English tasks: molecular discovery and optimization (64 tasks).",
       "contentUrl": "data/en/level5.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "md5": "efbf81e660c840f8e77557ad68c5033b"
     },
     {
       "@type": "cr:FileObject",
       "@id": "cn-level1",
       "name": "cn/level1.csv",
-      "description": "Level 1 Chinese tasks: molecular representation and property calculation (75 tasks).",
+      "description": "Level 1 Chinese tasks (75 tasks).",
       "contentUrl": "data/cn/level1.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "md5": "97103dcaee3cb19463a7401fe0e624ec"
     },
     {
       "@type": "cr:FileObject",
       "@id": "cn-level2",
       "name": "cn/level2.csv",
-      "description": "Level 2 Chinese tasks: molecular transformation and similarity (72 tasks).",
+      "description": "Level 2 Chinese tasks (72 tasks).",
       "contentUrl": "data/cn/level2.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "md5": "30ca815606895a769f96a5fb6b917d8a"
     },
     {
       "@type": "cr:FileObject",
       "@id": "cn-level3",
       "name": "cn/level3.csv",
-      "description": "Level 3 Chinese tasks: reasoning and complex operations (72 tasks).",
+      "description": "Level 3 Chinese tasks (72 tasks).",
       "contentUrl": "data/cn/level3.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "md5": "c0d77d7404a5ed670d9da49aa6f06ab5"
     },
     {
       "@type": "cr:FileObject",
       "@id": "cn-level4",
       "name": "cn/level4.csv",
-      "description": "Level 4 Chinese tasks: multi-step reasoning (75 tasks).",
+      "description": "Level 4 Chinese tasks (75 tasks).",
       "contentUrl": "data/cn/level4.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "md5": "461eb899c490c74a2cc7417eacb18b27"
     },
     {
       "@type": "cr:FileObject",
       "@id": "cn-level5",
       "name": "cn/level5.csv",
-      "description": "Level 5 Chinese tasks: molecular discovery and optimization (64 tasks).",
+      "description": "Level 5 Chinese tasks (64 tasks).",
       "contentUrl": "data/cn/level5.csv",
-      "encodingFormat": "text/csv"
-    },
-    {
-      "@type": "cr:FileSet",
-      "@id": "solutions-fileset",
-      "name": "Reference Solutions",
-      "description": "358 reference Python solution files organized by level (solutions/level{1-5}/temp{N}.py).",
-      "containedIn": {"@id": "repository"},
-      "encodingFormat": "text/x-python",
-      "includes": "solutions/level*/temp*.py"
-    },
-    {
-      "@type": "cr:FileObject",
-      "@id": "repository",
-      "name": "MolViBench GitHub Repository",
-      "contentUrl": "https://github.com/phenixace/MolViBench-open",
-      "encodingFormat": "application/x-git"
+      "encodingFormat": "text/csv",
+      "md5": "7ae2162bd51814fce7b8df7c20835037"
     }
   ],
   "recordSet": [
@@ -165,7 +151,7 @@
       "@type": "cr:RecordSet",
       "@id": "en-tasks",
       "name": "English Tasks",
-      "description": "All 358 English-language molecular coding tasks across 5 levels.",
+      "description": "358 English-language molecular coding tasks across 5 levels.",
       "field": [
         {
           "@type": "cr:Field",
@@ -174,7 +160,7 @@
           "description": "Natural-language description of the molecular computing task in English.",
           "dataType": "sc:Text",
           "source": {
-            "fileSet": {"@id": "en-level1"},
+            "fileObject": {"@id": "en-level1"},
             "extract": {"column": "question"}
           }
         }
@@ -184,7 +170,7 @@
       "@type": "cr:RecordSet",
       "@id": "cn-tasks",
       "name": "Chinese Tasks",
-      "description": "All 358 Chinese-language molecular coding tasks across 5 levels.",
+      "description": "358 Chinese-language molecular coding tasks across 5 levels.",
       "field": [
         {
           "@type": "cr:Field",
@@ -193,7 +179,7 @@
           "description": "Natural-language description of the molecular computing task in Chinese.",
           "dataType": "sc:Text",
           "source": {
-            "fileSet": {"@id": "cn-level1"},
+            "fileObject": {"@id": "cn-level1"},
             "extract": {"column": "question"}
           }
         }
