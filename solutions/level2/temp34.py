@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """将分子可视化为 3D 坐标。"""
     try:
         mol = Chem.MolFromSmiles(mol)
         mol = Chem.AddHs(mol)
@@ -18,8 +16,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    result = level_function("CCO")
-    print(f"3D 坐标: {result}")

@@ -2,9 +2,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, Descriptors
 import numpy as np
 
-
 def level_function(mols, k=3):
-    """给定一组分子，进行聚类并选择每类中 QED 最高的分子。"""
     try:
         mol_data = []
         for smi in mols:
@@ -25,7 +23,6 @@ def level_function(mols, k=3):
 
         X = np.array([d['fp'] for d in mol_data], dtype=float)
 
-        # K-means 聚类
         rng = np.random.RandomState(42)
         indices = rng.choice(n, k, replace=False)
         centroids = X[indices].copy()
@@ -42,7 +39,6 @@ def level_function(mols, k=3):
                 if len(members) > 0:
                     centroids[j] = members.mean(axis=0)
 
-        # 每类选 QED 最高的
         results = []
         for cluster_id in range(k):
             cluster_mols = [mol_data[i] for i in range(n) if labels[i] == cluster_id]
@@ -58,12 +54,3 @@ def level_function(mols, k=3):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = ["CCO", "c1ccccc1", "CC(=O)O", "c1ccncc1",
-                   "c1ccc(O)cc1", "CCCC", "CCN", "c1ccc(F)cc1"]
-    result = level_function(smiles_list, k=3)
-    if result:
-        for r in result:
-            print(f"  Cluster {r['cluster']}: {r['smiles']} (QED={r['qed']})")

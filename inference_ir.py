@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 """
-MolViBench - Self-Repair (SR)
+MolViBench - Incremental Repair (IR)
 ===============================
 
-Iterative self-repair: LLM generates code, code is executed locally,
+Iterative Incremental Repair: LLM generates code, code is executed locally,
 if execution fails the error is fed back to the LLM for correction.
 Repeats up to N rounds.
 
 Usage:
-    python inference_sr.py --base-url https://api.openai.com/v1 --api-key sk-xxx --model gpt-4o
-    python inference_sr.py ... --max-rounds 3 --lang cn --resume
+    python inference_ir.py --base-url https://api.openai.com/v1 --api-key sk-xxx --model gpt-4o
+    python inference_ir.py ... --max-rounds 3 --lang cn --resume
 """
 
 import argparse
@@ -150,7 +150,7 @@ def extract_code(response: str) -> str:
 
 
 # ============================================================
-# Local code execution (for self-repair feedback)
+# Local code execution (for Incremental Repair feedback)
 # ============================================================
 
 def execute_code_locally(code: str, test_smiles: str, timeout: int = 30) -> dict:
@@ -316,7 +316,7 @@ def execute_code_multi_molecule(code: str, molecules: list, timeout: int = 30) -
 
 
 # ============================================================
-# Agent: one question with self-repair loop
+# Agent: one question with Incremental Repair loop
 # ============================================================
 
 async def agent_solve_question(
@@ -443,7 +443,7 @@ async def run_agent(args):
     base_output = PROJECT_ROOT / "predictions" / run_tag
 
     print("=" * 60)
-    print("  MolViBench — Agent Mode Inference (Self-Repair)")
+    print("  MolViBench — Agent Mode Inference (Incremental Repair)")
     print("=" * 60)
     print(f"  Model:       {args.model}")
     print(f"  Base URL:    {args.base_url}")
@@ -574,7 +574,7 @@ async def run_agent(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="MolViBench — Agent Mode Inference (Self-Repair)",
+        description="MolViBench — Agent Mode Inference (Incremental Repair)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
@@ -587,7 +587,7 @@ def main():
         help="Levels to evaluate (default: 1 2 3 4 5)",
     )
     parser.add_argument("--lang", default="en", choices=["cn", "en"])
-    parser.add_argument("--max-rounds", type=int, default=3, help="Max self-repair rounds per question")
+    parser.add_argument("--max-rounds", type=int, default=3, help="Max Incremental Repair rounds per question")
 
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--max-tokens", type=int, default=4096)

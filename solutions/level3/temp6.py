@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol1, mol2):
-    """模拟卤代烷的亲核取代反应。"""
     try:
         reaction_smarts = '[C:1][Cl:2].[OH2:3]>>[C:1][OH]'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
@@ -25,9 +23,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    halide = "CCCl"
-    nucleophile = "O"
-    print(f"亲核取代反应产物: {level_function(halide, nucleophile)}")

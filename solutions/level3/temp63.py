@@ -1,21 +1,17 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdMolDescriptors
 
-
 def level_function(mol, num_confs=50):
-    """生成大环分子的多个 3D 构象并评估环张力。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
 
-        # Check if it has a macrocycle (ring >= 12)
         ring_info = mol_obj.GetRingInfo()
         max_ring_size = max((len(r) for r in ring_info.AtomRings()), default=0)
 
         mol_h = Chem.AddHs(mol_obj)
 
-        # Generate conformers
         params = AllChem.ETKDGv3()
         params.randomSeed = 42
         params.numThreads = 1
@@ -25,7 +21,6 @@ def level_function(mol, num_confs=50):
         if not cids:
             return None
 
-        # Optimize with MMFF and collect energies
         energies = []
         for cid in cids:
             try:
@@ -56,12 +51,3 @@ def level_function(mol, num_confs=50):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    # Cyclododecane - a 12-membered macrocycle
-    smiles = "C1CCCCCCCCCCC1"
-    result = level_function(smiles, num_confs=20)
-    if result:
-        print(f"Macrocycle: {result['is_macrocycle']}, Ring size: {result['max_ring_size']}")
-        print(f"Energy range: {result['energy_range']} kcal/mol")

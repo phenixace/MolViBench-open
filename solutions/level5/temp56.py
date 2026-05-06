@@ -3,9 +3,7 @@ from rdkit.Chem import AllChem, Descriptors, rdFMCS
 import numpy as np
 from collections import defaultdict
 
-
 def level_function(smiles_list, activities):
-    """对候选分子进行 Matched Molecular Pair 分析 → 找出对活性影响最大的结构变换。"""
     try:
         mols = [(s, Chem.MolFromSmiles(s)) for s in smiles_list]
         mols = [(s, m) for s, m in mols if m is not None]
@@ -14,14 +12,12 @@ def level_function(smiles_list, activities):
 
         acts = {s: a for (s, _), a in zip(mols, activities)}
 
-        # Find MMPs: pairs that share a large common substructure
         pairs = []
         for i in range(len(mols)):
             for j in range(i + 1, len(mols)):
                 smi_i, mol_i = mols[i]
                 smi_j, mol_j = mols[j]
 
-                # Find MCS
                 mcs = rdFMCS.FindMCS(
                     [mol_i, mol_j],
                     threshold=0.7,
@@ -32,20 +28,17 @@ def level_function(smiles_list, activities):
                 if mcs.canceled or mcs.numAtoms < 3:
                     continue
 
-                # Fraction of atoms in common
                 n_i = mol_i.GetNumHeavyAtoms()
                 n_j = mol_j.GetNumHeavyAtoms()
                 frac_i = mcs.numAtoms / n_i
                 frac_j = mcs.numAtoms / n_j
 
-                # MMP definition: at least 70% common, small structural difference
                 if frac_i >= 0.5 and frac_j >= 0.5:
                     core_smarts = mcs.smartsString
                     core_mol = Chem.MolFromSmarts(core_smarts)
                     if core_mol is None:
                         continue
 
-                    # Get the R-group difference
                     match_i = mol_i.GetSubstructMatch(core_mol)
                     match_j = mol_j.GetSubstructMatch(core_mol)
                     if not match_i or not match_j:
@@ -69,7 +62,6 @@ def level_function(smiles_list, activities):
                         "abs_delta": round(abs(act_diff), 4)
                     })
 
-        # Sort by absolute activity difference
         pairs.sort(key=lambda x: x["abs_delta"], reverse=True)
 
         return {
@@ -82,14 +74,3 @@ def level_function(smiles_list, activities):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = ["c1ccccc1", "c1ccc(O)cc1", "c1ccc(N)cc1", "c1ccc(F)cc1",
-              "c1ccc(Cl)cc1", "c1ccc(OC)cc1"]
-    acts = [1.0, 2.5, 3.0, 1.2, 1.8, 2.8]
-    result = level_function(smiles, acts)
-    if result:
-        print(f"Found {result['n_mmp_pairs']} MMP pairs")
-        for t in result["top_transformations"][:3]:
-            print(f"  {t['mol_A']} -> {t['mol_B']}: delta={t['activity_delta']}")

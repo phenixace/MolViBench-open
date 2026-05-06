@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """计算构象 RMSD。"""
     try:
         mol = Chem.MolFromSmiles(mol)
         if mol is None:
@@ -19,9 +17,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1CCO"
-    result = level_function(smiles)
-    print(f"两个构象的 RMSD: {result}")

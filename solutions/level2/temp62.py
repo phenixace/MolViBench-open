@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdChemReactions
 
-
 def level_function(mol, reaction_smarts):
-    """给定分子和反应 SMARTS，生成反应的原子映射编号。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -13,12 +11,10 @@ def level_function(mol, reaction_smarts):
         if rxn is None:
             return None
 
-        # Run reaction
         products = rxn.RunReactants((mol_obj,))
         if not products:
             return None
 
-        # Get atom mapping from the first product set
         result = []
         for prod_set in products[:1]:
             for prod in prod_set:
@@ -36,9 +32,3 @@ def level_function(mol, reaction_smarts):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1O"
-    rxn_smarts = "[OH:1]>>[Cl:1]"
-    print(f"原子映射: {level_function(smiles, rxn_smarts)}")

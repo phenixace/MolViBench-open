@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 
-
 def level_function(mol1, mol2):
-    """判断两个分子是否为共振体。"""
     try:
         m1 = Chem.MolFromSmiles(mol1)
         m2 = Chem.MolFromSmiles(mol2)
@@ -33,9 +31,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return False
-
-
-if __name__ == "__main__":
-    mol1 = "C=C[O-]"
-    mol2 = "[CH2-]C=O"
-    print(f"是否为共振体: {level_function(mol1, mol2)}")

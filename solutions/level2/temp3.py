@@ -2,9 +2,6 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 
 def level_function(mol1, mol2):
-    """
-    计算两个分子的 Cosine 相似度。
-    """
     try:
         m1 = Chem.MolFromSmiles(mol1)
         if m1 is None:
@@ -18,8 +15,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
-
-if __name__ == "__main__":
-    smiles1 = "CCO"
-    smiles2 = "CCCO"
-    print(f"Cosine 相似度: {level_function(smiles1, smiles2)}")

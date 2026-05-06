@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """模拟烯烃的卤化。"""
     try:
         reaction_smarts = '[C:1]=[C:2]>>[C:1]([Cl])[C:2]([Cl])'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
@@ -24,8 +22,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "C=C"
-    print(f"烯烃卤化产物: {level_function(smiles)}")

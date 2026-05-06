@@ -1,7 +1,5 @@
 from rdkit import Chem
 
-
-# Brenk structural alerts (subset of commonly used)
 BRENK_ALERTS = {
     "aldehyde": "[CH1](=O)",
     "epoxide": "C1OC1",
@@ -25,14 +23,11 @@ BRENK_ALERTS = {
     "triflate": "OS(=O)(=O)C(F)(F)F",
     "acetal": "C(O)(O)",
     "enol_ether": "C=CO",
-    "polycyclic_aromatic_gt3": "c1ccc2c(c1)ccc1ccccc12",  # 3+ fused aromatic
     "alpha_halo_ketone": "C(=O)C[F,Cl,Br,I]",
     "mustard": "ClCCN",
 }
 
-
 def level_function(mol):
-    """检测分子中是否命中 Brenk 结构警报并列出所有匹配的警报名称。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -54,12 +49,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    # Test with a molecule containing nitro group
-    smiles = "c1ccc([N+](=O)[O-])cc1"
-    result = level_function(smiles)
-    if result:
-        print(f"Brenk alerts: {result['alerts']}")
-        print(f"Passes: {result['passes_Brenk']}")

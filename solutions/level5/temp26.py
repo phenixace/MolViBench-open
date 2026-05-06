@@ -2,9 +2,7 @@ from rdkit import Chem
 from rdkit.Chem import Descriptors
 import random
 
-
 def level_function(mol):
-    """给定一个候选分子，生成更小的衍生物以降低分子量。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -15,7 +13,6 @@ def level_function(mol):
 
         derivatives = []
 
-        # 策略: 删除末端原子/侧链
         terminal_atoms = [
             atom.GetIdx() for atom in mol_obj.GetAtoms()
             if atom.GetDegree() == 1 and atom.GetAtomicNum() != 1
@@ -45,9 +42,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O"  # 布洛芬
-    result = level_function(smiles)
-    print(f"更小的衍生物: {result}")

@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
-
 def level_function(mol):
-    """给定一个候选分子，生成更大但保持 QED > 0.5 的衍生物。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -12,14 +10,13 @@ def level_function(mol):
         orig_mw = Descriptors.MolWt(mol_obj)
         orig_smi = Chem.MolToSmiles(mol_obj)
 
-        # 策略: 添加基团
         growth_rxns = [
-            ('[cH:1]>>[c:1]C', '添加甲基'),
-            ('[cH:1]>>[c:1]OC', '添加甲氧基'),
-            ('[cH:1]>>[c:1]F', '添加氟'),
-            ('[cH:1]>>[c:1]Cl', '添加氯'),
-            ('[cH:1]>>[c:1]CC', '添加乙基'),
-            ('[NH2:1]>>[NH:1]C(=O)C', '酰化'),
+            ('[cH:1]>>[c:1]C', 'Add methyl'),
+            ('[cH:1]>>[c:1]OC', 'Add methoxy'),
+            ('[cH:1]>>[c:1]F', 'Add fluorine'),
+            ('[cH:1]>>[c:1]Cl', 'Add chlorine'),
+            ('[cH:1]>>[c:1]CC', 'Add ethyl'),
+            ('[NH2:1]>>[NH:1]C(=O)C', 'Acylation'),
         ]
 
         derivatives = []
@@ -50,9 +47,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccc(N)cc1"
-    result = level_function(smiles)
-    print(f"更大的衍生物: {result}")

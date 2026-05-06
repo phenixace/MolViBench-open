@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol1, mol2):
-    """模拟芳香化合物的 Friedel-Crafts 烷基化。"""
     try:
         reaction_smarts = '[c:1][H].[C:2][Cl]>>[c:1][C:2]'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
@@ -25,9 +23,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    aromatic = "c1ccccc1"
-    alkyl_halide = "CCl"
-    print(f"Friedel-Crafts 烷基化产物: {level_function(aromatic, alkyl_halide)}")

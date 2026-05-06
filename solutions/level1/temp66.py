@@ -4,9 +4,7 @@ import os, sys
 sys.path.append(os.path.join(RDConfig.RDContribDir, 'SA_Score'))
 import sascorer
 
-
 def level_function(mol):
-    """计算分子的合成可及性评分（SA Score）。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -16,8 +14,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1"
-    print(f"SA Score: {level_function(smiles)}")

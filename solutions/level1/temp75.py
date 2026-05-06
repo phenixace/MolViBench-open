@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 
-
 def level_function(mol):
-    """计算分子中氮原子和氧原子的总数（NOCount）。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -12,8 +10,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CC(=O)Nc1ccc(O)cc1"
-    print(f"NOCount: {level_function(smiles)}")

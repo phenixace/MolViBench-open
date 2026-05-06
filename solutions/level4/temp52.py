@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Crippen
 
-
 def level_function(mol):
-    """给定分子 → 计算 LogP → 若 LogP>3 则添加羟基，若 LogP<0 则添加甲基 → 重新计算 LogP → 判断是否落入 [1,3] 区间。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -15,7 +13,6 @@ def level_function(mol):
         final_mol = mol_obj
 
         if logp > 3:
-            # Add hydroxyl group
             rxn = AllChem.ReactionFromSmarts('[cH:1]>>[c:1]O')
             products = rxn.RunReactants((mol_obj,))
             if products:
@@ -30,7 +27,6 @@ def level_function(mol):
                     Chem.SanitizeMol(final_mol)
                     action = "add_OH"
         elif logp < 0:
-            # Add methyl group
             rxn = AllChem.ReactionFromSmarts('[cH:1]>>[c:1]C')
             products = rxn.RunReactants((mol_obj,))
             if products:
@@ -58,8 +54,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccc(CCCC)cc1"  # High LogP
-    print(f"result: {level_function(smiles)}")

@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol, reaction_smarts_list):
-    """给定分子和一系列反应 SMARTS → 依次尝试每个反应 → 若反应无产物则跳过并记录 → 返回所有成功反应的产物列表。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -54,15 +52,3 @@ def level_function(mol, reaction_smarts_list):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccc(O)cc1"
-    rxns = [
-        "[OH:1]>>[Cl:1]",           # OH -> Cl
-        "[NH2:1]>>[N:1]C(=O)C",     # Won't match (no NH2)
-        "[cH:1]>>[c:1]C",           # Add methyl
-    ]
-    result = level_function(smiles, rxns)
-    if result:
-        print(f"Success: {result['successful_reactions']}, Skipped: {result['skipped_reactions']}")

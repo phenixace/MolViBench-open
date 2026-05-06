@@ -2,11 +2,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 import numpy as np
 
-
 def level_function(mols):
-    """使用 UMAP 对一组分子指纹进行降维可视化。"""
     try:
-        from sklearn.manifold import TSNE  # Fallback if umap not available
 
         fps = []
         valid_smiles = []
@@ -22,7 +19,6 @@ def level_function(mols):
 
         X = np.array(fps)
 
-        # Try UMAP first, fall back to t-SNE
         try:
             import umap
             reducer = umap.UMAP(n_components=2, random_state=42)
@@ -43,12 +39,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = ["c1ccccc1", "CCO", "CC(=O)O", "c1ccc(O)cc1", "CCCC",
-                   "CC(C)C", "c1ccncc1", "CC=O", "CCC(=O)O", "CCCCO"]
-    result = level_function(smiles_list)
-    if result:
-        for r in result[:3]:
-            print(r)

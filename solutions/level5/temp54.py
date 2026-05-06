@@ -5,11 +5,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score
 
-
 def level_function(smiles_list, activities, new_smiles_list=None, fp_radius=2, fp_bits=2048, seed=42):
-    """给定一组分子及其活性数据，提取分子指纹和描述符，构建 QSAR 回归模型并预测新分子活性。"""
     try:
-        # Parse molecules and compute fingerprints
         mols = [Chem.MolFromSmiles(s) for s in smiles_list]
         if any(m is None for m in mols):
             return None
@@ -34,13 +31,10 @@ def level_function(smiles_list, activities, new_smiles_list=None, fp_radius=2, f
         X = np.hstack([X_fp, X_desc])
         y = np.array(activities, dtype=float)
 
-        # Build model
         rf = RandomForestRegressor(n_estimators=100, random_state=seed)
 
-        # Cross-validation
         cv_scores = cross_val_score(rf, X, y, cv=min(5, len(y)), scoring='r2')
 
-        # Fit on all data
         rf.fit(X, y)
         train_pred = rf.predict(X)
         train_r2 = r2_score(y, train_pred)
@@ -55,7 +49,6 @@ def level_function(smiles_list, activities, new_smiles_list=None, fp_radius=2, f
             "train_rmse": round(train_rmse, 4),
         }
 
-        # Predict new molecules if provided
         if new_smiles_list:
             new_mols = [Chem.MolFromSmiles(s) for s in new_smiles_list]
             new_fps = []
@@ -89,16 +82,3 @@ def level_function(smiles_list, activities, new_smiles_list=None, fp_radius=2, f
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = ["c1ccccc1", "c1ccc(O)cc1", "c1ccc(N)cc1", "c1ccc(F)cc1",
-              "c1ccc(Cl)cc1", "c1ccc(Br)cc1", "c1ccc(C)cc1", "c1ccc(OC)cc1",
-              "c1ccc(C(=O)O)cc1", "c1ccc(C#N)cc1"]
-    acts = [1.0, 1.5, 2.0, 1.2, 1.8, 2.5, 0.8, 1.4, 3.0, 2.2]
-    result = level_function(smiles, acts, new_smiles_list=["c1ccc(CC)cc1"])
-    if result:
-        print(f"CV R²: {result['cv_r2_mean']} ± {result['cv_r2_std']}")
-        if "predictions" in result:
-            for p in result["predictions"]:
-                print(f"  {p['smiles']}: {p['predicted_activity']}")

@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol1, mol2):
-    """模拟烯烃的 Diels-Alder 反应。"""
     try:
         reaction_smarts = '[C:1]=[C:2][C:3]=[C:4].[C:5]=[C:6]>>[C:1]1[C:2]=[C:3][C:4][C:6][C:5]1'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
@@ -25,9 +23,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    diene = "C=CC=C"
-    dienophile = "C=C"
-    print(f"Diels-Alder 反应产物: {level_function(diene, dienophile)}")

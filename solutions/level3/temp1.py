@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """用 SMARTS 定义醇 → 卤代物反应。"""
     try:
         reaction_smarts = '[C:1][OH:2]>>[C:1][Cl]'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
@@ -24,8 +22,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CCO"
-    print(f"醇→卤代物反应产物: {level_function(smiles)}")

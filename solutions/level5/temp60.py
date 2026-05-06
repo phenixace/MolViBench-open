@@ -3,9 +3,7 @@ from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem, Descriptors, Crippen, BRICS, FilterCatalog
 from rdkit.SimDivFilters.rdSimDivPickers import MaxMinPicker
 
-
 def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
-    """组合库设计完整流程：给定骨架和 R-group 列表 → 枚举所有组合 → 级联过滤（Lipinski + Veber + PAINS + Brenk）→ MaxMin 多样性选择 Top-50 → 输出候选及性质摘要。"""
     try:
         np.random.seed(seed)
 
@@ -13,20 +11,13 @@ def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
         if scaffold is None:
             return None
 
-        # Enumerate combinations using ReplaceSubstructs
-        # rgroup_lists: list of lists, each inner list = SMILES for one R-group position
-        # Use [*:1], [*:2], etc. as attachment points
-
-        # Simple enumeration: for each R-group position, replace dummy atoms
         products = set()
         if len(rgroup_lists) == 0:
             return None
 
-        # Start with scaffold, iteratively replace each R-group
         current_mols = [scaffold_smiles]
         for pos_idx, rgroups in enumerate(rgroup_lists):
             next_mols = []
-            dummy_smarts = f"[#{0}]"  # Use wildcard atom [*]
             for base_smi in current_mols:
                 base_mol = Chem.MolFromSmiles(base_smi)
                 if base_mol is None:
@@ -36,7 +27,6 @@ def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
                     if rg_mol is None:
                         continue
                     try:
-                        # Direct combination via SMILES concatenation at attachment point
                         combined_smi = base_smi.replace(f"[*:{pos_idx+1}]", rg_smi, 1)
                         combined_mol = Chem.MolFromSmiles(combined_smi)
                         if combined_mol is not None:
@@ -48,20 +38,16 @@ def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
                 current_mols = list(set(next_mols))
 
         products = set(current_mols)
-        # Remove the original scaffold if it's still there
         products.discard(scaffold_smiles)
 
         n_enumerated = len(products)
 
-        # Parse all products
         parsed = []
         for smi in products:
             mol = Chem.MolFromSmiles(smi)
             if mol is not None:
                 parsed.append((smi, mol))
 
-        # Cascade filtering
-        # 1. Lipinski
         lipinski_pass = []
         for smi, mol in parsed:
             mw = Descriptors.MolWt(mol)
@@ -72,7 +58,6 @@ def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
                 lipinski_pass.append((smi, mol))
         n_lipinski = len(lipinski_pass)
 
-        # 2. Veber
         veber_pass = []
         for smi, mol in lipinski_pass:
             tpsa = Descriptors.TPSA(mol)
@@ -81,7 +66,6 @@ def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
                 veber_pass.append((smi, mol))
         n_veber = len(veber_pass)
 
-        # 3. PAINS filter
         pains_params = FilterCatalog.FilterCatalogParams()
         pains_params.AddCatalog(FilterCatalog.FilterCatalogParams.FilterCatalogs.PAINS)
         pains_catalog = FilterCatalog.FilterCatalog(pains_params)
@@ -92,7 +76,6 @@ def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
                 pains_pass.append((smi, mol))
         n_pains = len(pains_pass)
 
-        # 4. Brenk filter
         brenk_params = FilterCatalog.FilterCatalogParams()
         brenk_params.AddCatalog(FilterCatalog.FilterCatalogParams.FilterCatalogs.BRENK)
         brenk_catalog = FilterCatalog.FilterCatalog(brenk_params)
@@ -103,7 +86,6 @@ def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
                 brenk_pass.append((smi, mol))
         n_brenk = len(brenk_pass)
 
-        # MaxMin diversity selection
         if len(brenk_pass) <= n_select:
             selected = brenk_pass
         else:
@@ -116,7 +98,6 @@ def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
             picks = picker.LazyPick(dist_fn, len(fps), n_select, seed=seed)
             selected = [brenk_pass[i] for i in picks]
 
-        # Output properties summary
         results = []
         for smi, mol in selected:
             results.append({
@@ -145,16 +126,3 @@ def level_function(scaffold_smiles, rgroup_lists, n_select=50, seed=42):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    scaffold = "c1ccc([*:1])c([*:2])c1"
-    rgroups = [
-        ["F", "Cl", "Br", "O", "N", "C"],
-        ["C(=O)O", "C(=O)N", "C#N", "C(F)(F)F", "OC"],
-    ]
-    result = level_function(scaffold, rgroups, n_select=10)
-    if result:
-        print(f"Pipeline: {result['pipeline_summary']}")
-        for m in result['selected_molecules'][:5]:
-            print(f"  {m['smiles']} (QED={m['QED']})")

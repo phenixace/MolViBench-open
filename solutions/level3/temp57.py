@@ -1,16 +1,13 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdFMCS
 
-
 def level_function(mol1, mol2):
-    """找出两个分子之间的 Matched Molecular Pair (MMP) 变换。"""
     try:
         m1 = Chem.MolFromSmiles(mol1)
         m2 = Chem.MolFromSmiles(mol2)
         if m1 is None or m2 is None:
             return None
 
-        # Find MCS as the common core
         mcs_result = rdFMCS.FindMCS([m1, m2],
                                      atomCompare=rdFMCS.AtomCompare.CompareElements,
                                      bondCompare=rdFMCS.BondCompare.CompareOrder,
@@ -23,18 +20,15 @@ def level_function(mol1, mol2):
         if mcs_mol is None:
             return None
 
-        # Get the parts that differ
         match1 = m1.GetSubstructMatch(mcs_mol)
         match2 = m2.GetSubstructMatch(mcs_mol)
 
         if not match1 or not match2:
             return None
 
-        # Find atoms NOT in MCS for each molecule
         diff_atoms1 = set(range(m1.GetNumAtoms())) - set(match1)
         diff_atoms2 = set(range(m2.GetNumAtoms())) - set(match2)
 
-        # Extract differing fragments
         def get_diff_smiles(mol, diff_atoms):
             if not diff_atoms:
                 return "[H]"
@@ -64,12 +58,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smi1 = "c1ccc(Cl)cc1"
-    smi2 = "c1ccc(F)cc1"
-    result = level_function(smi1, smi2)
-    if result:
-        print(f"MMP 变换: {result['transformation']}")
-        print(f"核心: {result['core_smarts']}")

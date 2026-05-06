@@ -1,17 +1,13 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, Crippen, rdMolDescriptors, FilterCatalog
 
-
-# Brenk alerts (subset)
 BRENK_SMARTS = {
     "aldehyde": "[CH1](=O)", "epoxide": "C1OC1",
     "peroxide": "OO", "azide": "N=[N+]=[N-]",
     "disulfide": "SS", "nitro": "[N+](=O)[O-]",
 }
 
-
 def level_function(smiles_list):
-    """给定分子列表 → 逐个检查 Veber + Ghose + Brenk 规则 → 将每个分子分类为 safe/risky/reject → 输出各类别的统计数量。"""
     try:
         categories = {"safe": [], "risky": [], "reject": []}
 
@@ -28,14 +24,11 @@ def level_function(smiles_list):
             num_atoms = mol.GetNumAtoms()
             mr = Crippen.MolMR(mol)
 
-            # Veber
             veber = rot_bonds <= 10 and tpsa <= 140
 
-            # Ghose
             ghose = (160 <= mw <= 480 and -0.4 <= logp <= 5.6 and
                      40 <= num_atoms <= 480 and 20 <= mr <= 130)
 
-            # Brenk
             brenk_pass = True
             for name, smarts in BRENK_SMARTS.items():
                 pattern = Chem.MolFromSmarts(smarts)
@@ -64,11 +57,3 @@ def level_function(smiles_list):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    mols = ["c1ccc(NC(=O)c2ccccc2)cc1", "CCO", "c1ccc([N+](=O)[O-])cc1",
-            "CC(C)Cc1ccc(C(C)C(=O)O)cc1", "CCCCCCCCCCCCCCCCCCCC"]
-    result = level_function(mols)
-    if result:
-        print(f"Safe: {result['safe_count']}, Risky: {result['risky_count']}, Reject: {result['reject_count']}")

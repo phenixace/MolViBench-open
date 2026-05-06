@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol, filename="output.pdb"):
-    """将分子导出为 PDB 文件。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -16,9 +14,3 @@ def level_function(mol, filename="output.pdb"):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CCO"
-    result = level_function(smiles, "output.pdb")
-    print(f"分子已导出为 PDB 文件: {result}")

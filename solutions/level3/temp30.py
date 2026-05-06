@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """预测反应的 regioselectivity。"""
     try:
         molecule = Chem.MolFromSmiles(mol)
         if molecule is None:
@@ -60,9 +58,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccc(O)cc1"
-    result = level_function(smiles)
-    print(f"Regioselectivity 预测: {result}")

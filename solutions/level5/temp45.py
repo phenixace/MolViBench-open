@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, Descriptors
 
-
 def level_function(scaffold, n_modifications=10):
-    """给定一个 scaffold → 生成多种侧链修饰 → 保留 QED > 0.7 → 比较相似度。"""
     try:
         scaffold_mol = Chem.MolFromSmiles(scaffold)
         if scaffold_mol is None:
@@ -11,18 +9,17 @@ def level_function(scaffold, n_modifications=10):
 
         scaffold_fp = AllChem.GetMorganFingerprintAsBitVect(scaffold_mol, 2, nBits=2048)
 
-        # Step 1: 生成侧链修饰
         rxns = [
-            ('[cH:1]>>[c:1]C', '甲基'),
-            ('[cH:1]>>[c:1]CC', '乙基'),
-            ('[cH:1]>>[c:1]O', '羟基'),
-            ('[cH:1]>>[c:1]OC', '甲氧基'),
-            ('[cH:1]>>[c:1]F', '氟'),
-            ('[cH:1]>>[c:1]Cl', '氯'),
-            ('[cH:1]>>[c:1]N', '氨基'),
-            ('[cH:1]>>[c:1]NC(=O)C', '酰胺'),
-            ('[cH:1]>>[c:1]C(F)(F)F', '三氟甲基'),
-            ('[cH:1]>>[c:1]C#N', '氰基'),
+            ('[cH:1]>>[c:1]C', 'Methyl'),
+            ('[cH:1]>>[c:1]CC', 'Ethyl'),
+            ('[cH:1]>>[c:1]O', 'Hydroxyl'),
+            ('[cH:1]>>[c:1]OC', 'Methoxy'),
+            ('[cH:1]>>[c:1]F', 'Fluorine'),
+            ('[cH:1]>>[c:1]Cl', 'Chlorine'),
+            ('[cH:1]>>[c:1]N', 'Amino'),
+            ('[cH:1]>>[c:1]NC(=O)C', 'Amide'),
+            ('[cH:1]>>[c:1]C(F)(F)F', 'Trifluoromethyl'),
+            ('[cH:1]>>[c:1]C#N', 'Cyano'),
         ]
 
         derivatives = []
@@ -39,7 +36,6 @@ def level_function(scaffold, n_modifications=10):
                             continue
                         seen.add(smi)
 
-                        # Step 2: 筛选 QED > 0.7
                         qed = Descriptors.qed(product)
                         if qed > 0.7:
                             fp = AllChem.GetMorganFingerprintAsBitVect(product, 2, nBits=2048)
@@ -58,11 +54,3 @@ def level_function(scaffold, n_modifications=10):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    scaffold = "c1ccccc1"
-    result = level_function(scaffold)
-    if result:
-        for r in result[:5]:
-            print(f"  {r['smiles']}: QED={r['qed']}, sim={r['similarity_to_scaffold']}")

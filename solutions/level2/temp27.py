@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """计算构象相似度矩阵。"""
     try:
         mol = Chem.MolFromSmiles(mol)
         if mol is None:
@@ -26,12 +24,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1CCO"
-    result = level_function(smiles)
-    if result:
-        print(f"构象相似度矩阵 ({len(result)}x{len(result)}):")
-        for row in result:
-            print([f"{v:.3f}" for v in row])

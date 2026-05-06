@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
-
 def level_function(mols):
-    """给定一组分子，筛选符合 Rule of Three（片段发现规则）的分子。"""
     try:
         results = []
         for smi in mols:
@@ -26,8 +24,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = ["c1ccncc1", "CCO", "c1ccccc1", "CC(=O)O"]
-    print(f"Rule of Three 符合: {level_function(smiles_list)}")

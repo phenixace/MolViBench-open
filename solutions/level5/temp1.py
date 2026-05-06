@@ -2,11 +2,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, rdMolDescriptors
 import random
 
-
 def level_function(mols):
-    """给定一组已知活性分子，生成与其相似度 >0.7 的新分子候选。"""
     try:
-        # Parse active molecules
         active_mols = []
         active_fps = []
         for smi in mols:
@@ -19,7 +16,6 @@ def level_function(mols):
         if not active_mols:
             return []
 
-        # Define common substituents for modification
         substituents = ['C', 'O', 'N', 'F', 'Cl', 'CC', 'OC', 'NC']
         candidates = set()
 
@@ -27,7 +23,6 @@ def level_function(mols):
             smi = Chem.MolToSmiles(mol)
             rw_mol = Chem.RWMol(mol)
 
-            # Strategy 1: Add atoms to each heavy atom
             for atom_idx in range(mol.GetNumAtoms()):
                 atom = mol.GetAtomWithIdx(atom_idx)
                 if atom.GetImplicitValence() > 0:
@@ -46,7 +41,6 @@ def level_function(mols):
                         except Exception:
                             pass
 
-            # Strategy 2: Replace atoms with different elements
             for atom_idx in range(mol.GetNumAtoms()):
                 atom = mol.GetAtomWithIdx(atom_idx)
                 orig_num = atom.GetAtomicNum()
@@ -65,7 +59,6 @@ def level_function(mols):
                         except Exception:
                             pass
 
-        # Filter candidates by similarity > 0.7
         results = []
         for cand_smi in candidates:
             cand_mol = Chem.MolFromSmiles(cand_smi)
@@ -81,13 +74,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = [
-        "c1ccccc1",
-        "CC(=O)Oc1ccccc1OC(C)=O",
-        "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",
-    ]
-    result = level_function(smiles_list)
-    print(f"result: {result[:10] if result else result}")

@@ -1,7 +1,5 @@
 from rdkit import Chem
 
-
-# BBB permeation rules based on SMARTS patterns and molecular properties
 BBB_RULES = {
     "MW_lt_400": lambda mol: Chem.Descriptors.MolWt(mol) < 400,
     "LogP_1_to_3": lambda mol: 1.0 <= Chem.Crippen.MolLogP(mol) <= 3.0,
@@ -11,9 +9,7 @@ BBB_RULES = {
     "RotBonds_lt_8": lambda mol: Chem.rdMolDescriptors.CalcNumRotatableBonds(mol) < 8,
 }
 
-
 def level_function(mol):
-    """基于 SMARTS 规则集预测分子是否能通过血脑屏障（BBB）。"""
     try:
         from rdkit.Chem import Descriptors, Crippen, rdMolDescriptors
 
@@ -53,11 +49,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccc(NC(=O)C)cc1"  # Acetanilide - small, should pass BBB
-    result = level_function(smiles)
-    if result:
-        print(f"BBB permeable: {result['BBB_permeable']}")
-        print(f"Rules passed: {result['rules_passed']}")

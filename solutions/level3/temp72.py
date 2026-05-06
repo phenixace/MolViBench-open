@@ -1,15 +1,12 @@
 from rdkit import Chem
 
-
 def level_function(generated_smiles, reference_smiles=None):
-    """给定一组生成的 SMILES，计算其 validity、uniqueness 和 novelty 指标。"""
     try:
         if not generated_smiles:
             return None
 
         total = len(generated_smiles)
 
-        # Validity: fraction of parseable SMILES
         valid_mols = []
         valid_smiles_set = set()
         for smi in generated_smiles:
@@ -21,10 +18,8 @@ def level_function(generated_smiles, reference_smiles=None):
 
         validity = len(valid_mols) / total if total > 0 else 0.0
 
-        # Uniqueness: fraction of unique among valid
         uniqueness = len(valid_smiles_set) / len(valid_mols) if valid_mols else 0.0
 
-        # Novelty: fraction of unique valid not in reference set
         novelty = 1.0
         if reference_smiles:
             ref_set = set()
@@ -47,14 +42,3 @@ def level_function(generated_smiles, reference_smiles=None):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    generated = ["CCO", "c1ccccc1", "CCO", "INVALID_SMILES", "CC(=O)O",
-                  "c1ccccc1", "CCN", "CCC", "bad_mol", "CCCC"]
-    reference = ["CCO", "c1ccccc1", "CC(=O)O"]
-    result = level_function(generated, reference)
-    if result:
-        print(f"Validity: {result['validity']}")
-        print(f"Uniqueness: {result['uniqueness']}")
-        print(f"Novelty: {result['novelty']}")

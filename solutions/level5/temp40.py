@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, Descriptors
 
-
 def level_function(mols):
-    """给定一组分子，构建"相似度–药物性"热图。"""
     try:
         mol_data = []
         for smi in mols:
@@ -22,7 +20,6 @@ def level_function(mols):
         if n < 2:
             return None
 
-        # 构建相似度矩阵
         sim_matrix = [[0.0] * n for _ in range(n)]
         for i in range(n):
             for j in range(n):
@@ -43,14 +40,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = ["CCO", "c1ccccc1", "CC(=O)O", "c1ccncc1"]
-    result = level_function(smiles_list)
-    if result:
-        print(f"SMILES: {result['smiles']}")
-        print(f"QED: {result['qed_values']}")
-        print("相似度矩阵:")
-        for row in result['similarity_matrix']:
-            print(f"  {row}")

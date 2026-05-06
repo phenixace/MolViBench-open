@@ -2,13 +2,10 @@ import numpy as np
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem, Descriptors, Crippen, rdMolDescriptors
 
-
 def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
-    """实现分子的多目标进化优化：使用遗传算法同时优化 QED、LogP 和 SA Score。"""
     try:
         np.random.seed(seed)
 
-        # Load SA scorer once (cache)
         _sascorer = None
         try:
             import os as _os
@@ -22,7 +19,6 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
             _sascorer = None
 
         def get_sa_score(mol):
-            """SA score using cached sascorer or BertzCT fallback."""
             try:
                 if _sascorer is not None:
                     return _sascorer.calculateScore(mol)
@@ -31,19 +27,16 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 return 5.0
 
         def fitness(mol):
-            """Multi-objective fitness: maximize QED, target LogP in [1,3], minimize SA."""
             try:
                 qed = Descriptors.qed(mol)
                 logp = Crippen.MolLogP(mol)
                 sa = get_sa_score(mol)
 
-                # LogP score: 1.0 if in [1, 3], penalize outside
                 if 1.0 <= logp <= 3.0:
                     logp_score = 1.0
                 else:
                     logp_score = max(0, 1.0 - abs(logp - 2.0) / 5.0)
 
-                # SA score: normalize to [0, 1] (lower is better, max SA ~10)
                 sa_score = max(0, 1.0 - (sa - 1.0) / 9.0)
 
                 return 0.4 * qed + 0.3 * logp_score + 0.3 * sa_score
@@ -51,7 +44,6 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 return 0.0
 
         def mutate(mol):
-            """Perform a random SMILES mutation."""
             try:
                 rwmol = Chem.RWMol(mol)
                 n_atoms = rwmol.GetNumAtoms()
@@ -61,7 +53,6 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 mutation_type = np.random.choice(['add_atom', 'remove_atom', 'change_bond', 'change_atom'])
 
                 if mutation_type == 'add_atom':
-                    atom_types = [6, 7, 8, 9, 17]  # C, N, O, F, Cl
                     new_atom = Chem.Atom(atom_types[np.random.randint(len(atom_types))])
                     idx = rwmol.AddAtom(new_atom)
                     attach = np.random.randint(n_atoms)
@@ -92,7 +83,6 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 return mol
 
         def crossover(mol1, mol2):
-            """Simple crossover by combining fragments."""
             try:
                 combined = Chem.CombineMols(mol1, mol2)
                 rwmol = Chem.RWMol(combined)
@@ -107,7 +97,6 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
             except Exception:
                 return mol1
 
-        # Initialize population from seed
         seed_mol = Chem.MolFromSmiles(seed_smiles)
         if seed_mol is None:
             return None
@@ -122,7 +111,6 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
 
         history = []
         for gen in range(n_generations):
-            # Evaluate fitness
             scored = [(mol, fitness(mol)) for mol in population]
             scored.sort(key=lambda x: x[1], reverse=True)
 
@@ -136,18 +124,14 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 "mean_fitness": round(float(np.mean([s[1] for s in scored])), 4),
             })
 
-            # Selection: top 50%
             survivors = [mol for mol, _ in scored[:population_size // 2]]
 
-            # Generate new population
             new_pop = list(survivors)
             while len(new_pop) < population_size:
                 if np.random.random() < 0.7:
-                    # Mutation
                     parent = survivors[np.random.randint(len(survivors))]
                     child = mutate(parent)
                 else:
-                    # Crossover
                     p1 = survivors[np.random.randint(len(survivors))]
                     p2 = survivors[np.random.randint(len(survivors))]
                     child = crossover(p1, p2)
@@ -158,7 +142,6 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
 
             population = new_pop[:population_size]
 
-        # Final evaluation
         final_scored = [(mol, fitness(mol)) for mol in population]
         final_scored.sort(key=lambda x: x[1], reverse=True)
 
@@ -181,16 +164,7 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
             "final_fitness": round(history[-1]["best_fitness"], 4),
             "improvement": round(history[-1]["best_fitness"] - history[0]["best_fitness"], 4),
             "top_molecules": top_results,
-            "evolution_history": history[::5],  # every 5th generation
         }
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    result = level_function("c1ccc(NC(=O)C)cc1", population_size=30, n_generations=20)
-    if result:
-        print(f"Improvement: {result['initial_fitness']} -> {result['final_fitness']}")
-        for m in result['top_molecules'][:3]:
-            print(f"  {m['smiles']} (QED={m['QED']}, LogP={m['LogP']}, SA={m['SA_score']})")

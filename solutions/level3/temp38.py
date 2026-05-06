@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem.MolStandardize import rdMolStandardize
 
-
 def level_function(mol1, mol2):
-    """判断两个分子是否为互变异构体。"""
     try:
         m1 = Chem.MolFromSmiles(mol1)
         m2 = Chem.MolFromSmiles(mol2)
@@ -30,9 +28,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return False
-
-
-if __name__ == "__main__":
-    mol1 = "CC(=O)CC"
-    mol2 = "CC(O)=CC"
-    print(f"是否为互变异构体: {level_function(mol1, mol2)}")

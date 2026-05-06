@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, rdMolDescriptors
 
-
 def level_function(mol):
-    """给定一个候选分子，生成更极性的衍生物以提高溶解度。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -12,11 +10,10 @@ def level_function(mol):
         orig_tpsa = rdMolDescriptors.CalcTPSA(mol_obj)
         orig_smi = Chem.MolToSmiles(mol_obj)
 
-        # 策略: 添加极性基团 (-OH, -NH2, =O)
         polar_rxns = [
-            ('[cH:1]>>[c:1]O', '添加羟基'),
-            ('[cH:1]>>[c:1]N', '添加氨基'),
-            ('[CH3:1]>>[CH2:1]O', '烷基氧化'),
+            ('[cH:1]>>[c:1]O', 'Add hydroxyl'),
+            ('[cH:1]>>[c:1]N', 'Add amino'),
+            ('[CH3:1]>>[CH2:1]O', 'Alkyl oxidation'),
         ]
 
         derivatives = []
@@ -45,9 +42,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1CC"
-    result = level_function(smiles)
-    print(f"更极性的衍生物: {result}")

@@ -1,11 +1,8 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, FilterCatalog
 
-
 def level_function(smiles_list):
-    """给定分子列表 → 逐个检测是否含 PAINS 子结构 → 过滤掉含 PAINS 的分子 → 对剩余分子计算 QED → 返回 QED 最高的前 3 个。"""
     try:
-        # Set up PAINS filter
         params = FilterCatalog.FilterCatalogParams()
         params.AddCatalog(FilterCatalog.FilterCatalogParams.FilterCatalogs.PAINS)
         catalog = FilterCatalog.FilterCatalog(params)
@@ -27,7 +24,6 @@ def level_function(smiles_list):
                 "QED": round(qed, 4)
             })
 
-        # Sort by QED descending
         passed.sort(key=lambda x: x["QED"], reverse=True)
 
         return {
@@ -39,13 +35,3 @@ def level_function(smiles_list):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    mols = ["c1ccccc1", "CC(=O)Nc1ccccc1", "CCO", "c1ccc(O)cc1",
-            "CC(C)Cc1ccc(C(C)C(=O)O)cc1"]
-    result = level_function(mols)
-    if result:
-        print(f"Filtered: {result['pains_filtered']}, Top-3:")
-        for m in result['top3']:
-            print(f"  {m['smiles']}: QED={m['QED']}")

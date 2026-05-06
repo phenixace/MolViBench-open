@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import rdRGroupDecomposition
 
-
 def level_function(mols, core_smiles):
-    """对一组含相同骨架的分子进行 R-Group 分解。"""
     try:
         core = Chem.MolFromSmiles(core_smiles)
         if core is None:
@@ -35,9 +33,3 @@ def level_function(mols, core_smiles):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    core = "c1ccccc1"
-    mols_list = ["c1ccc(O)cc1", "c1ccc(N)cc1", "c1ccc(F)cc1"]
-    print(f"R-Group 分解: {level_function(mols_list, core)}")

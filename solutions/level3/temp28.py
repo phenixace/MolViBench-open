@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol1, mol2):
-    """模拟亲核加成反应。"""
     try:
         carbonyl = Chem.MolFromSmiles(mol1)
         nucleophile = Chem.MolFromSmiles(mol2)
@@ -36,9 +34,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    carbonyl = "CC=O"
-    nucleophile = "CN"
-    print(f"亲核加成产物: {level_function(carbonyl, nucleophile)}")

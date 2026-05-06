@@ -2,14 +2,10 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 def level_function(mol, substituent="C"):
-    """
-    给定苯，生成间位取代产物。
-    """
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
-        # 间位取代：在苯环的1,3位添加取代基
         rxn_smarts = f'[cH:1]1[cH:2][cH:3][cH:4][cH:5][cH:6]1>>[c:1]({substituent})1[cH:2][c:3]({substituent})[cH:4][cH:5][cH:6]1'
         rxn = AllChem.ReactionFromSmarts(rxn_smarts)
         products = rxn.RunReactants((mol_obj,))
@@ -25,8 +21,3 @@ def level_function(mol, substituent="C"):
     except Exception as e:
         print(e)
         return None
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1"  # 苯
-    result = level_function(smiles, "C")
-    print(f"间位取代产物: {result}")

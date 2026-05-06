@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """模拟羧酸的还原为醇。"""
     try:
         reaction_smarts = '[C:1](=[O:2])[OH:3]>>[C:1]([H])([H])[OH]'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
@@ -24,8 +22,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CC(=O)O"
-    print(f"羧酸还原为醇产物: {level_function(smiles)}")

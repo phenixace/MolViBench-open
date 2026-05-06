@@ -1,12 +1,8 @@
 from rdkit import Chem
 
-
-# CYP450 inhibitor substructure patterns (common CYP inhibitor motifs)
 CYP_SMARTS = {
-    "azole": "[nR1]1[cR1][nR1][cR1][cR1]1",     # Imidazole/triazole
     "thioamide": "[#6]C(=S)N",
     "hydroxamic_acid": "[OH]NC=O",
-    "methylenedioxy": "OCOc",                       # Methylenedioxyphenyl
     "furan": "c1ccoc1",
     "thiophene": "c1ccsc1",
     "hydrazine": "NN",
@@ -16,9 +12,7 @@ CYP_SMARTS = {
     "primary_amine_aromatic": "c[NH2]",
 }
 
-
 def level_function(mol):
-    """基于子结构规则预测分子是否为 CYP450 酶抑制剂。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -43,11 +37,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1cnc[nH]1"  # Imidazole - known CYP inhibitor motif
-    result = level_function(smiles)
-    if result:
-        print(f"CYP inhibitor: {result['predicted_CYP_inhibitor']}")
-        print(f"Alerts: {result['matched_patterns']}")

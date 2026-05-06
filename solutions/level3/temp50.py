@@ -1,21 +1,11 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
-
 def level_function(mol):
-    """给定分子，预测是否符合 Rule of Three（片段库）。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
-
-        # Rule of Three 条件:
-        # MW ≤ 300
-        # LogP ≤ 3
-        # HBD ≤ 3
-        # HBA ≤ 3
-        # 旋转键 ≤ 3
-        # TPSA ≤ 60
 
         mw = Descriptors.MolWt(mol_obj)
         logp = Descriptors.MolLogP(mol_obj)
@@ -39,8 +29,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccncc1"  # 吡啶
-    print(f"Rule of Three 检查: {level_function(smiles)}")

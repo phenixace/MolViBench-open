@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """模拟消除反应。"""
     try:
         molecule = Chem.MolFromSmiles(mol)
         if molecule is None:
@@ -32,8 +30,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CCCBr"
-    print(f"消除反应产物: {level_function(smiles)}")

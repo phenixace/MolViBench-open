@@ -2,11 +2,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, Lipinski
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
-
 def level_function(mols):
-    """从一组已知药物中提取 scaffold → 生成取代衍生物 → 筛选 Lipinski 符合的分子。"""
     try:
-        # Step 1: 提取 scaffold
         scaffolds = []
         for smi in mols:
             mol = Chem.MolFromSmiles(smi)
@@ -23,7 +20,6 @@ def level_function(mols):
         if not scaffolds:
             return None
 
-        # Step 2: 生成取代衍生物
         rxns = [
             '[cH:1]>>[c:1]C',
             '[cH:1]>>[c:1]O',
@@ -46,7 +42,6 @@ def level_function(mols):
                         except Exception:
                             continue
 
-        # Step 3: 筛选 Lipinski
         results = []
         for smi in derivatives:
             mol = Chem.MolFromSmiles(smi)
@@ -67,11 +62,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = ["CC(=O)Oc1ccccc1C(=O)O", "c1ccc(O)cc1"]
-    result = level_function(smiles_list)
-    if result:
-        for r in result[:5]:
-            print(f"  {r['smiles']}: MW={r['mw']}, LogP={r['logp']}")

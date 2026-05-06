@@ -2,13 +2,10 @@ from rdkit import Chem
 from rdkit.Chem.Scaffolds import MurckoScaffold
 import random
 
-
 def level_function(smiles_list, test_ratio=0.2, random_seed=42):
-    """给定一组分子，基于 Murcko scaffold 进行训练集/测试集划分并返回划分结果。"""
     try:
         random.seed(random_seed)
 
-        # Extract scaffolds for each molecule
         scaffold_to_mols = {}
         valid_smiles = []
         for smi in smiles_list:
@@ -28,16 +25,13 @@ def level_function(smiles_list, test_ratio=0.2, random_seed=42):
         if not valid_smiles:
             return None
 
-        # Sort scaffolds by size (number of molecules) for reproducibility
         scaffolds = sorted(scaffold_to_mols.keys(),
                           key=lambda s: len(scaffold_to_mols[s]),
                           reverse=True)
 
-        # Assign scaffolds to test set until we reach desired ratio
         n_total = len(valid_smiles)
         n_test_target = int(n_total * test_ratio)
 
-        # Shuffle scaffolds with seed
         scaffold_list = list(scaffolds)
         random.shuffle(scaffold_list)
 
@@ -65,14 +59,3 @@ def level_function(smiles_list, test_ratio=0.2, random_seed=42):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    mols = ["c1ccccc1O", "c1ccccc1N", "c1ccccc1F",
-            "c1ccncc1O", "c1ccncc1N",
-            "CCCCO", "CCCCN", "CCCC(=O)O",
-            "c1ccc2ccccc2c1", "c1ccc2ccccc2c1O"]
-    result = level_function(mols, test_ratio=0.3, random_seed=42)
-    if result:
-        print(f"Train: {result['train_size']}, Test: {result['test_size']}")
-        print(f"Scaffolds: {result['num_scaffolds']}")

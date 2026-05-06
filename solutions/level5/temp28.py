@@ -2,9 +2,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 from rdkit.Chem import rdMolDescriptors
 
-
 def _synthetic_complexity_score(mol):
-    """简化的合成复杂度评分 (基于分子特征)。"""
     num_rings = mol.GetRingInfo().NumRings()
     num_chiral = len(Chem.FindMolChiralCenters(mol, includeUnassigned=True))
     num_hetero = sum(1 for a in mol.GetAtoms() if a.GetAtomicNum() not in [1, 6])
@@ -12,9 +10,7 @@ def _synthetic_complexity_score(mol):
     score = num_rings * 1.5 + num_chiral * 2.0 + num_hetero * 0.5 + mw / 200.0
     return round(score, 2)
 
-
 def level_function(mol):
-    """给定一个候选分子，生成更容易合成的衍生物（降低合成复杂性评分）。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -25,7 +21,6 @@ def level_function(mol):
 
         derivatives = []
 
-        # 策略: 删除末端原子简化结构
         for idx in range(mol_obj.GetNumAtoms()):
             atom = mol_obj.GetAtomWithIdx(idx)
             if atom.GetDegree() == 1 and atom.GetAtomicNum() != 1:
@@ -47,7 +42,6 @@ def level_function(mol):
                 except Exception:
                     continue
 
-        # 策略 2: 替换杂原子为碳
         for idx in range(mol_obj.GetNumAtoms()):
             atom = mol_obj.GetAtomWithIdx(idx)
             if atom.GetAtomicNum() not in [1, 6] and not atom.GetIsAromatic():
@@ -74,9 +68,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O"
-    result = level_function(smiles)
-    print(f"更简单的衍生物: {result}")

@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """模拟苯的磺化反应。"""
     try:
         reaction_smarts = '[c:1][H]>>[c:1]S(=O)(=O)O'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
@@ -24,8 +22,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1"
-    print(f"磺化反应产物: {level_function(smiles)}")

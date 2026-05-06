@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(product):
-    """给定产物，反推可能反应物。"""
     try:
         mol = Chem.MolFromSmiles(product)
         if mol is None:
@@ -31,8 +29,3 @@ def level_function(product):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    product = "CC(=O)OCC"
-    print(f"反推反应物: {level_function(product)}")

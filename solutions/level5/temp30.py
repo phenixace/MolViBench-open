@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, rdMolDescriptors
 
-
 def level_function(mol):
-    """给定一个候选分子，探索不同的芳环取代方式并比较 LogP。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -17,14 +15,14 @@ def level_function(mol):
         orig_smi = Chem.MolToSmiles(mol_obj)
 
         substituents = [
-            ('[cH:1]>>[c:1]C', '甲基'),
-            ('[cH:1]>>[c:1]O', '羟基'),
-            ('[cH:1]>>[c:1]N', '氨基'),
-            ('[cH:1]>>[c:1]F', '氟'),
-            ('[cH:1]>>[c:1]Cl', '氯'),
-            ('[cH:1]>>[c:1]OC', '甲氧基'),
-            ('[cH:1]>>[c:1]C(F)(F)F', '三氟甲基'),
-            ('[cH:1]>>[c:1][N+](=O)[O-]', '硝基'),
+            ('[cH:1]>>[c:1]C', 'Methyl'),
+            ('[cH:1]>>[c:1]O', 'Hydroxyl'),
+            ('[cH:1]>>[c:1]N', 'Amino'),
+            ('[cH:1]>>[c:1]F', 'Fluorine'),
+            ('[cH:1]>>[c:1]Cl', 'Chlorine'),
+            ('[cH:1]>>[c:1]OC', 'Methoxy'),
+            ('[cH:1]>>[c:1]C(F)(F)F', 'Trifluoromethyl'),
+            ('[cH:1]>>[c:1][N+](=O)[O-]', 'Nitro'),
         ]
 
         results = []
@@ -51,12 +49,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1"
-    result = level_function(smiles)
-    if result:
-        print(f"原始 LogP: {result['original_logp']}")
-        for d in result['derivatives']:
-            print(f"  {d['substituent']}: LogP={d['logp']} (Δ={d['delta_logp']})")

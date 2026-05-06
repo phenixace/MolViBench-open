@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol1, mol2):
-    """模拟醇与卤代烷的 Williamson 合成。"""
     try:
         reaction_smarts = '[OH:1].[C:2][Br]>>[O:1][C:2]'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
@@ -25,9 +23,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    alcohol = "CCO"
-    halide = "CCBr"
-    print(f"Williamson 合成产物: {level_function(alcohol, halide)}")

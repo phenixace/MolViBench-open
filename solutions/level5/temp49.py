@@ -2,11 +2,8 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, Descriptors, Lipinski
 import numpy as np
 
-
 def level_function(mols):
-    """从一组候选 → 筛选 Rule of Five → 做聚类 → 每类保留一个代表分子。"""
     try:
-        # Step 1: 筛选 Rule of Five
         ro5_mols = []
         for smi in mols:
             mol = Chem.MolFromSmiles(smi)
@@ -30,7 +27,6 @@ def level_function(mols):
         n = len(ro5_mols)
         k = min(5, n)
 
-        # Step 2: K-means 聚类
         X = np.array([d['fp'] for d in ro5_mols], dtype=float)
         rng = np.random.RandomState(42)
         indices = rng.choice(n, k, replace=False)
@@ -48,7 +44,6 @@ def level_function(mols):
                 if len(members) > 0:
                     centroids[j] = members.mean(axis=0)
 
-        # Step 3: 每类保留 QED 最高的代表分子
         results = []
         for cluster_id in range(k):
             cluster_mols = [ro5_mols[i] for i in range(n) if labels[i] == cluster_id]
@@ -64,13 +59,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = ["CCO", "c1ccccc1", "CC(=O)O", "c1ccncc1",
-                   "c1ccc(O)cc1", "CCCC", "CCN", "c1ccc(F)cc1",
-                   "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O"]
-    result = level_function(smiles_list)
-    if result:
-        for r in result:
-            print(f"  Cluster {r['cluster']}: {r['smiles']} (QED={r['qed']})")

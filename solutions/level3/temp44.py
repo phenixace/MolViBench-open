@@ -1,26 +1,18 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
-# 常见代谢反应 SMARTS
 METABOLIC_REACTIONS = [
-    # 氧化反应
-    ("[CH3:1]>>[CH2:1]O", "烷基氧化 (C-H → C-OH)"),
-    ("[cH:1]>>[c:1]O", "芳环氧化"),
-    ("[NH2:1]>>[NH:1]O", "N-氧化"),
-    ("[SX2:1]>>[S:1](=O)", "S-氧化"),
-    # 脱甲基反应
-    ("[O:1]C>>[O:1]", "O-脱甲基"),
-    ("[N:1](C)>>[NH:1]", "N-脱甲基"),
-    # 水解
-    ("[C:1](=O)[O:2][C:3]>>[C:1](=O)[OH:2].[OH][C:3]", "酯水解"),
-    # 还原
-    ("[C:1](=O)[C:2]>>[C:1](O)[C:2]", "酮还原"),
+    ("[CH3:1]>>[CH2:1]O", "Alkyl oxidation (C-H → C-OH)"),
+    ("[cH:1]>>[c:1]O", "Aromatic oxidation"),
+    ("[NH2:1]>>[NH:1]O", "N-oxidation"),
+    ("[SX2:1]>>[S:1](=O)", "S-oxidation"),
+    ("[O:1]C>>[O:1]", "O-demethylation"),
+    ("[N:1](C)>>[NH:1]", "N-demethylation"),
+    ("[C:1](=O)[O:2][C:3]>>[C:1](=O)[OH:2].[OH][C:3]", "Ester hydrolysis"),
+    ("[C:1](=O)[C:2]>>[C:1](O)[C:2]", "Ketone reduction"),
 ]
 
-
 def level_function(mol):
-    """给定分子，预测可能的代谢产物。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -44,11 +36,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CC(=O)Oc1ccccc1OC(C)=O"  # 阿司匹林
-    result = level_function(smiles)
-    if result:
-        for m in result:
-            print(f"  {m['reaction']}: {m['smiles']}")

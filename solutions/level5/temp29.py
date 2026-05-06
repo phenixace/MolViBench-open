@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 
-
 def level_function(mol):
-    """给定一个候选分子，替换杂环核心 → 计算相似度保持 >0.6。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -18,7 +16,6 @@ def level_function(mol):
         if not atom_rings:
             return None
 
-        # 找到杂环 (含非碳原子的环)
         heterocyclic_atoms = set()
         for ring in atom_rings:
             for idx in ring:
@@ -29,7 +26,6 @@ def level_function(mol):
         if not heterocyclic_atoms:
             return None
 
-        # 策略: 替换杂环中的杂原子
         replacements = [(6, 'C'), (7, 'N'), (8, 'O'), (16, 'S')]
         results = []
 
@@ -62,9 +58,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccncc1CC(=O)O"
-    result = level_function(smiles)
-    print(f"杂环替换: {result}")

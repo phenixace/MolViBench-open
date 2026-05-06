@@ -3,9 +3,7 @@ from rdkit.Chem import Descriptors, AllChem
 import pandas as pd
 import io
 
-
 def level_function(sdf_content):
-    """从 SDF 文件批量读取分子并计算所有描述符，输出为 DataFrame。"""
     try:
         supplier = Chem.SDMolSupplier()
         supplier.SetData(sdf_content)
@@ -34,15 +32,3 @@ def level_function(sdf_content):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    # Create a small test SDF in memory
-    mols = [Chem.MolFromSmiles(s) for s in ["CCO", "c1ccccc1", "CC(=O)O"]]
-    sdf_str = ""
-    for m in mols:
-        if m:
-            AllChem.Compute2DCoords(m)
-            sdf_str += Chem.MolToMolBlock(m) + "$$$$\n"
-    result = level_function(sdf_str)
-    print(result)

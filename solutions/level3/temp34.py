@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """给定分子，生成所有构象异构体。"""
     try:
         molecule = Chem.MolFromSmiles(mol)
         if molecule is None:
@@ -42,12 +40,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    mol = "CCCCCC"
-    result = level_function(mol)
-    if result:
-        print(f"生成构象异构体数量: {len(result)}")
-        for conf in result[:3]:
-            print(f"  Conf {conf['conf_id']}, Energy: {conf['energy']:.2f}")

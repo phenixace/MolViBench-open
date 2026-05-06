@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, rdMolDescriptors
 
-
 def level_function(mol):
-    """给定一个候选分子，生成更疏水的衍生物以提高膜通透性。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -12,12 +10,11 @@ def level_function(mol):
         orig_logp = Descriptors.MolLogP(mol_obj)
         orig_smi = Chem.MolToSmiles(mol_obj)
 
-        # 策略: 添加疏水基团 (-CH3, -F, -Cl) 或删除极性基团
         hydro_rxns = [
-            ('[cH:1]>>[c:1]C', '添加甲基'),
-            ('[cH:1]>>[c:1]F', '添加氟'),
-            ('[cH:1]>>[c:1]Cl', '添加氯'),
-            ('[OH:1]>>[H:1]', '删除羟基'),
+            ('[cH:1]>>[c:1]C', 'Add methyl'),
+            ('[cH:1]>>[c:1]F', 'Add fluorine'),
+            ('[cH:1]>>[c:1]Cl', 'Add chlorine'),
+            ('[OH:1]>>[H:1]', 'Remove hydroxyl'),
         ]
 
         derivatives = []
@@ -46,9 +43,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccc(O)cc1"
-    result = level_function(smiles)
-    print(f"更疏水的衍生物: {result}")

@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """模拟醇的氧化为醛。"""
     try:
         reaction_smarts = '[C:1]([H])([H])[OH:2]>>[C:1]([H])=O'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
@@ -24,8 +22,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CCO"
-    print(f"醇氧化为醛产物: {level_function(smiles)}")

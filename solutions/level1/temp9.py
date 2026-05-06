@@ -1,7 +1,6 @@
 from rdkit import Chem
 
 def level_function(mol):
-    """判断分子是否含有氨基 (-NH2)。"""
     try:
         mol = Chem.MolFromSmiles(mol)
         if mol is None:
@@ -11,6 +10,3 @@ def level_function(mol):
         print(e)
         return None
     
-if __name__ == "__main__":
-    smiles = "CC(N)C(=O)O"
-    print(f"是否含有氨基: {level_function(smiles)}")

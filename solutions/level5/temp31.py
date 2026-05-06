@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, Descriptors
 
-
 def level_function(mols):
-    """给定一组分子，计算它们的 "相似度 vs QED" 二维图。"""
     try:
         mol_data = []
         for smi in mols:
@@ -21,7 +19,6 @@ def level_function(mols):
         if len(mol_data) < 2:
             return None
 
-        # 计算每个分子与其他分子的平均相似度
         results = []
         for i, d in enumerate(mol_data):
             sims = []
@@ -40,11 +37,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = ["CCO", "c1ccccc1", "CC(=O)Oc1ccccc1C(=O)O", "c1ccncc1"]
-    result = level_function(smiles_list)
-    if result:
-        for r in result:
-            print(f"  {r['smiles']}: sim={r['avg_similarity']}, QED={r['qed']}")

@@ -1,7 +1,5 @@
 from rdkit import Chem
 
-
-# Ames mutagenicity structural alerts
 AMES_ALERTS = {
     "aromatic_amine": "[NH2]c",
     "nitroso": "N=O",
@@ -20,9 +18,7 @@ AMES_ALERTS = {
     "acyl_hydrazide": "C(=O)NN",
 }
 
-
 def level_function(mol):
-    """检测分子是否含有 Ames 致突变性结构警报。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -44,11 +40,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccc(N)cc1"  # Aniline - known Ames-positive
-    result = level_function(smiles)
-    if result:
-        print(f"Ames risk: {result['Ames_risk']}")
-        print(f"Alerts: {result['alerts']}")

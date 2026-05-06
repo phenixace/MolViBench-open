@@ -2,9 +2,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 import numpy as np
 
-
 def level_function(mols, perplexity=5, n_iter=500, lr=100.0):
-    """对分子做 t-SNE 降维可视化（基于指纹）。"""
     try:
         fps = []
         valid_smiles = []
@@ -22,8 +20,6 @@ def level_function(mols, perplexity=5, n_iter=500, lr=100.0):
         n = X.shape[0]
         perplexity = min(perplexity, n - 1)
 
-        # ---------- 简易 t-SNE 实现 (Barnes-Hut 近似省略) ----------
-        # 1. 计算高维相似度 (对称化的条件概率)
         def _pairwise_sq_dist(M):
             sum_sq = np.sum(M ** 2, axis=1)
             return sum_sq[:, None] + sum_sq[None, :] - 2 * M @ M.T
@@ -49,7 +45,6 @@ def level_function(mols, perplexity=5, n_iter=500, lr=100.0):
         P = (P + P.T) / (2 * n)
         P = np.maximum(P, 1e-12)
 
-        # 2. 梯度下降
         Y = np.random.randn(n, 2) * 0.01
         for it in range(n_iter):
             d_low = _pairwise_sq_dist(Y)
@@ -71,10 +66,3 @@ def level_function(mols, perplexity=5, n_iter=500, lr=100.0):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = ["CCO", "c1ccccc1", "CC(=O)O", "CCCC", "c1ccc(O)cc1",
-                   "CC(C)O", "c1ccncc1", "CCN"]
-    result = level_function(smiles_list)
-    print(f"t-SNE 降维结果: {result}")

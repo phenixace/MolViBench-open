@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol1, mol2):
-    """模拟羧酸的 Amidation。"""
     try:
         acid = Chem.MolFromSmiles(mol1)
         amine = Chem.MolFromSmiles(mol2)
@@ -25,9 +23,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    acid = "CC(=O)O"
-    amine = "CCN"
-    print(f"Amidation products: {level_function(acid, amine)}")

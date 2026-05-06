@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol, threshold=1000.0):
-    """判断分子是否稳定（能量阈值）。"""
     try:
         mol = Chem.MolFromSmiles(mol)
         mol = Chem.AddHs(mol)
@@ -18,8 +16,3 @@ def level_function(mol, threshold=1000.0):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    result = level_function("CCO", 1000.0)
-    print(f"分子是否稳定: {result}")

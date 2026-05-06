@@ -1,21 +1,17 @@
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors
 
-
-# 常见药效团 SMARTS 定义
 PHARMACOPHORE_PATTERNS = {
-    "氢键供体": "[#7H,#8H,#16H]",
-    "氢键受体": "[#7,#8,#16;!H0;v2,v3,v4,v5]",
-    "正电荷中心": "[+,NH3+,NH2+,NH+]",
-    "负电荷中心": "[-,C(=O)[O-],S(=O)(=O)[O-]]",
-    "芳香环": "a1aaaaa1",
-    "疏水中心": "[CH2,CH3,c]",
-    "卤素": "[F,Cl,Br,I]",
+    "H-bond donor": "[#7H,#8H,#16H]",
+    "H-bond acceptor": "[#7,#8,#16;!H0;v2,v3,v4,v5]",
+    "Positive charge center": "[+,NH3+,NH2+,NH+]",
+    "Negative charge center": "[-,C(=O)[O-],S(=O)(=O)[O-]]",
+    "Aromatic ring": "a1aaaaa1",
+    "Hydrophobic center": "[CH2,CH3,c]",
+    "Halogen": "[F,Cl,Br,I]",
 }
 
-
 def level_function(mol):
-    """给定分子，预测可能的药效团。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -38,11 +34,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CC(=O)Oc1ccccc1C(=O)O"  # 阿司匹林
-    result = level_function(smiles)
-    if result:
-        for p in result:
-            print(f"  {p['type']}: {p['count']} 个")

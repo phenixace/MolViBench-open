@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """计算 3D 构象的能量。"""
     try:
         mol = Chem.MolFromSmiles(mol)
         if mol is None:
@@ -22,9 +20,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CCO"
-    result = level_function(smiles)
-    print(f"3D 构象能量: {result}")

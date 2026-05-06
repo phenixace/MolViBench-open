@@ -2,16 +2,12 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 import numpy as np
 
-
 def level_function(mol):
-    """将分子转为 PyTorch Geometric 兼容的图数据格式。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
 
-        # Node features: atomic number, degree, formal charge, num Hs,
-        # is_aromatic, hybridization
         node_features = []
         for atom in mol_obj.GetAtoms():
             features = [
@@ -24,7 +20,6 @@ def level_function(mol):
             ]
             node_features.append(features)
 
-        # Edge index (COO format)
         edge_index = [[], []]
         edge_attr = []
         bond_type_map = {
@@ -37,7 +32,6 @@ def level_function(mol):
             i = bond.GetBeginAtomIdx()
             j = bond.GetEndAtomIdx()
             bt = bond_type_map.get(bond.GetBondType(), 0)
-            # Undirected: add both directions
             edge_index[0].extend([i, j])
             edge_index[1].extend([j, i])
             edge_attr.extend([bt, bt])
@@ -52,11 +46,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1"
-    result = level_function(smiles)
-    if result:
-        print(f"Nodes: {result['num_nodes']}, Edges: {result['num_edges']}")
-        print(f"Node features shape: ({result['num_nodes']}, 6)")

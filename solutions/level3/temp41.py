@@ -1,9 +1,7 @@
 from rdkit import Chem
 import random
 
-
 def level_function(mol):
-    """随机扰动分子结构（键级别）。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -18,7 +16,6 @@ def level_function(mol):
         bond_idx = bond.GetIdx()
         current_type = bond.GetBondType()
 
-        # 尝试改变键类型
         bond_types = [Chem.BondType.SINGLE, Chem.BondType.DOUBLE, Chem.BondType.TRIPLE]
         candidates = [bt for bt in bond_types if bt != current_type]
         if not candidates:
@@ -35,9 +32,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CCCC"
-    for _ in range(5):
-        print(f"键级扰动: {level_function(smiles)}")

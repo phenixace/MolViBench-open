@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
-
 def level_function(fragment, linkers=None):
-    """给定一个 fragment → 通过拼接生成候选 → 选择 LogP 在 2~4 的分子 → 计算 QED。"""
     try:
         frag_mol = Chem.MolFromSmiles(fragment)
         if frag_mol is None:
@@ -12,10 +10,8 @@ def level_function(fragment, linkers=None):
         if linkers is None:
             linkers = ["CC", "CCC", "CCO", "CCNC", "C(=O)"]
 
-        # Step 1: 通过拼接生成候选
         candidates = set()
 
-        # 策略: 在 fragment 上添加 linker + 基团
         growth_rxns = [
             '[cH:1]>>[c:1]CC',
             '[cH:1]>>[c:1]CCC',
@@ -37,7 +33,6 @@ def level_function(fragment, linkers=None):
                     except Exception:
                         continue
 
-        # Step 2: 选择 LogP 在 2~4 的
         filtered = []
         for smi in candidates:
             mol = Chem.MolFromSmiles(smi)
@@ -47,7 +42,6 @@ def level_function(fragment, linkers=None):
             if 2 <= logp <= 4:
                 filtered.append({'smiles': smi, 'logp': round(logp, 2), 'mol': mol})
 
-        # Step 3: 计算 QED
         results = []
         for item in filtered:
             qed = Descriptors.qed(item['mol'])
@@ -62,11 +56,3 @@ def level_function(fragment, linkers=None):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    frag = "c1ccncc1"
-    result = level_function(frag)
-    if result:
-        for r in result[:5]:
-            print(f"  {r['smiles']}: LogP={r['logp']}, QED={r['qed']}")

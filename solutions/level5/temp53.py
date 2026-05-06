@@ -2,34 +2,19 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, Crippen
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
-
 def level_function(mol_smiles, replacement_rings=None):
-    """给定起始分子，系统性进行 scaffold morphing（替换核心环系统）→ 评估每种替换的性质变化（LogP, TPSA, QED）。"""
     try:
         mol = Chem.MolFromSmiles(mol_smiles)
         if mol is None:
             return None
 
-        # Extract scaffold
         scaffold = MurckoScaffold.GetScaffoldForMol(mol)
         scaffold_smi = Chem.MolToSmiles(scaffold)
 
-        # Default replacement ring systems
         if replacement_rings is None:
             replacement_rings = [
-                "c1ccncc1",      # pyridine
-                "c1ccoc1",       # furan
-                "c1ccsc1",       # thiophene
-                "c1cc[nH]c1",    # pyrrole
-                "c1cnc2ccccc2n1", # quinazoline
-                "C1CCNCC1",      # piperidine
-                "C1CCOCC1",      # tetrahydropyran
-                "c1ccc2[nH]ccc2c1",  # indole
-                "c1cnc[nH]1",    # imidazole
-                "c1ccnnc1",      # pyridazine
             ]
 
-        # Calculate original properties
         orig_logp = Crippen.MolLogP(mol)
         orig_tpsa = Descriptors.TPSA(mol)
         orig_qed = Descriptors.qed(mol)
@@ -79,11 +64,3 @@ def level_function(mol_smiles, replacement_rings=None):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    result = level_function("c1ccc(NC(=O)C)cc1")
-    if result:
-        print(f"Original scaffold: {result['original']['scaffold']}")
-        for m in result['morphed'][:3]:
-            print(f"  {m['new_ring']} -> {m['morphed_smiles']} (dQED={m['delta_QED']})")

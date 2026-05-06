@@ -2,15 +2,12 @@ import numpy as np
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem, Descriptors, Crippen
 
-
 def level_function(generated_smiles, reference_smiles):
-    """分子生成质量评估：给定一组生成的 SMILES 和参考分子集 → 计算 validity/uniqueness/novelty/内部多样性 → 计算性质分布 → 输出综合评估报告。"""
     try:
         n_total = len(generated_smiles)
         if n_total == 0:
             return None
 
-        # Step 1: Validity
         valid_mols = []
         valid_smiles = []
         for smi in generated_smiles:
@@ -22,11 +19,9 @@ def level_function(generated_smiles, reference_smiles):
 
         validity = len(valid_smiles) / n_total
 
-        # Step 2: Uniqueness (among valid)
         unique_smiles = set(valid_smiles)
         uniqueness = len(unique_smiles) / len(valid_smiles) if valid_smiles else 0.0
 
-        # Step 3: Novelty (not in reference set)
         ref_canonical = set()
         for smi in reference_smiles:
             mol = Chem.MolFromSmiles(smi)
@@ -36,7 +31,6 @@ def level_function(generated_smiles, reference_smiles):
         novel_smiles = unique_smiles - ref_canonical
         novelty = len(novel_smiles) / len(unique_smiles) if unique_smiles else 0.0
 
-        # Step 4: Internal diversity (average pairwise Tanimoto distance)
         unique_list = list(unique_smiles)
         unique_mols = [Chem.MolFromSmiles(s) for s in unique_list]
         fps = [AllChem.GetMorganFingerprintAsBitVect(m, 2, nBits=2048) for m in unique_mols if m is not None]
@@ -50,7 +44,6 @@ def level_function(generated_smiles, reference_smiles):
         else:
             internal_diversity = 0.0
 
-        # Step 5: Property distributions
         mw_vals, logp_vals, tpsa_vals, qed_vals = [], [], [], []
         for mol in unique_mols:
             if mol is not None:
@@ -71,13 +64,11 @@ def level_function(generated_smiles, reference_smiles):
                 "median": round(float(np.median(arr)), 4),
             }
 
-        # Step 6: FCD-like metric: property distribution overlap with reference
         ref_mols = [Chem.MolFromSmiles(s) for s in reference_smiles]
         ref_mols = [m for m in ref_mols if m is not None]
         ref_mw = [Descriptors.MolWt(m) for m in ref_mols]
         ref_logp = [Crippen.MolLogP(m) for m in ref_mols]
 
-        # KL-divergence approximation via histogram overlap for MW and LogP
         def hist_overlap(vals1, vals2, bins=20):
             if not vals1 or not vals2:
                 return 0.0
@@ -119,18 +110,3 @@ def level_function(generated_smiles, reference_smiles):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    generated = [
-        "c1ccccc1", "c1ccc(O)cc1", "c1ccc(N)cc1", "invalid_smiles",
-        "c1ccc(F)cc1", "c1ccc(Cl)cc1", "c1ccccc1",  # duplicate
-        "CCO", "CCCO", "CC(=O)O",
-    ]
-    reference = ["c1ccccc1", "CCO", "CC(C)O", "c1ccncc1"]
-    result = level_function(generated, reference)
-    if result:
-        print(f"Validity: {result['metrics']['validity']}")
-        print(f"Uniqueness: {result['metrics']['uniqueness']}")
-        print(f"Novelty: {result['metrics']['novelty']}")
-        print(f"Diversity: {result['metrics']['internal_diversity']}")

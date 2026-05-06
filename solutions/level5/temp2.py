@@ -1,15 +1,12 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """给定一个目标 SMILES，生成所有一取代衍生物（自动替换一个氢）。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
 
-        # Common substituents to replace H: F, Cl, OH, NH2, CH3
         substituent_atoms = {
             'F': 9,
             'Cl': 17,
@@ -41,8 +38,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    result = level_function("c1ccccc1")
-    print(f"result: {result}")

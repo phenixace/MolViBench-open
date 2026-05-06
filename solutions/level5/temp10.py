@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 
-
 def level_function(mols):
-    """给定一组分子，基于结构相似性构建一个候选库。"""
     try:
         mol_data = []
         for smi in mols:
@@ -19,7 +17,6 @@ def level_function(mols):
         n = len(mol_data)
         similarity_threshold = 0.4
 
-        # Compute pairwise similarity matrix
         sim_matrix = []
         for i in range(n):
             row = []
@@ -31,7 +28,6 @@ def level_function(mols):
                     row.append(sim)
             sim_matrix.append(row)
 
-        # Cluster by similarity: greedy clustering
         clusters = []
         assigned = [False] * n
         for i in range(n):
@@ -46,11 +42,8 @@ def level_function(mols):
                         assigned[j] = True
             clusters.append(cluster)
 
-        # Select the molecule with lowest index as representative from each cluster
-        # (could also choose most "central" molecule)
         representatives = []
         for cluster in clusters:
-            # Pick the molecule with highest avg similarity to cluster members
             best_idx = cluster[0]
             if len(cluster) > 1:
                 best_avg_sim = 0
@@ -65,18 +58,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = [
-        "c1ccccc1",
-        "c1ccc(C)cc1",
-        "c1ccc(O)cc1",
-        "CCO",
-        "CCCO",
-        "CC(=O)O",
-        "c1ccncc1",
-        "c1ccc(F)cc1",
-    ]
-    result = level_function(smiles_list)
-    print(f"result: {result}")

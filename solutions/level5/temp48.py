@@ -1,33 +1,26 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, rdMolDescriptors
 
-
-# 简化药效团 SMARTS
 PHARMACOPHORE_SMARTS = {
-    "氢键供体": "[#7H,#8H]",
-    "氢键受体": "[#7,#8]",
-    "芳香环": "a1aaaaa1",
-    "疏水": "[CH2,CH3]",
+    "H-bond donor": "[#7H,#8H]",
+    "H-bond acceptor": "[#7,#8]",
+    "Aromatic ring": "a1aaaaa1",
+    "Hydrophobic": "[CH2,CH3]",
 }
 
-
-def level_function(pharmacophore_type="芳香环"):
-    """从一个药效团 → 生成匹配分子 → 筛选 TPSA < 90 → 选择分子量最小的前 3 个。"""
+def level_function(pharmacophore_type="Aromatic ring"):
     try:
-        # Step 1: 基于药效团类型生成候选分子
         if pharmacophore_type not in PHARMACOPHORE_SMARTS:
             return None
 
         smarts = PHARMACOPHORE_SMARTS[pharmacophore_type]
 
-        # 预定义一些含该药效团的分子骨架
         base_molecules = [
             "c1ccccc1", "c1ccncc1", "c1ccoc1", "c1ccsc1",
             "c1ccc(O)cc1", "c1ccc(N)cc1", "c1ccc(F)cc1",
             "c1ccc(C)cc1", "c1ccc(CC)cc1", "c1ccc2ccccc2c1",
         ]
 
-        # 生成衍生物
         rxns = [
             '[cH:1]>>[c:1]C',
             '[cH:1]>>[c:1]O',
@@ -56,7 +49,6 @@ def level_function(pharmacophore_type="芳香环"):
                         except Exception:
                             continue
 
-        # Step 2: 筛选 TPSA < 90
         filtered = []
         for smi in candidates:
             mol = Chem.MolFromSmiles(smi)
@@ -71,16 +63,8 @@ def level_function(pharmacophore_type="芳香环"):
                     'mw': round(mw, 2)
                 })
 
-        # Step 3: 选择分子量最小的前 3 个
         filtered.sort(key=lambda x: x['mw'])
         return filtered[:3]
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    result = level_function("芳香环")
-    if result:
-        for r in result:
-            print(f"  {r['smiles']}: MW={r['mw']}, TPSA={r['tpsa']}")

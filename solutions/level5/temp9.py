@@ -1,21 +1,17 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """给定一个 SMILES，使用枚举替代法生成所有卤素取代体。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
 
         original_smi = Chem.MolToSmiles(mol_obj)
-        halogens = [9, 17, 35, 53]  # F, Cl, Br, I
         halogen_names = {9: 'F', 17: 'Cl', 35: 'Br', 53: 'I'}
 
         derivatives = set()
 
-        # For each atom with implicit H, replace one H with each halogen
         for atom_idx in range(mol_obj.GetNumAtoms()):
             atom = mol_obj.GetAtomWithIdx(atom_idx)
             if atom.GetNumImplicitHs() > 0:
@@ -35,8 +31,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    result = level_function("c1ccccc1")
-    print(f"result: {result}")

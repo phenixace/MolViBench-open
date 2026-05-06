@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import rdFMCS
 
-
 def level_function(mol1, mol2):
-    """计算两个分子的最大公共子结构（MCS）。"""
     try:
         m1 = Chem.MolFromSmiles(mol1)
         m2 = Chem.MolFromSmiles(mol2)
@@ -22,9 +20,3 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smi1 = "c1ccccc1CCO"
-    smi2 = "c1ccccc1CCN"
-    print(f"MCS: {level_function(smi1, smi2)}")

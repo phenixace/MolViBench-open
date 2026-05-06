@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """用 MMFF94 力场优化分子构象。"""
     try:
         mol = Chem.MolFromSmiles(mol)
         if mol is None:
@@ -23,9 +21,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "CCO"
-    result = level_function(smiles)
-    print(f"MMFF94 优化后的 3D 坐标: {result}")

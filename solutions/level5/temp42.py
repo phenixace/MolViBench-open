@@ -2,16 +2,12 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
 
-
 def level_function(fragments):
-    """从一个 fragment 库中生长片段 → 生成候选 → 过滤掉 PAINS → 优化 LogP。"""
     try:
-        # PAINS 过滤器
         params = FilterCatalogParams()
         params.AddCatalog(FilterCatalogParams.FilterCatalogs.PAINS)
         catalog = FilterCatalog(params)
 
-        # Step 1: 片段生长 (对每个 fragment 添加基团)
         growth_rxns = [
             '[cH:1]>>[c:1]C',
             '[cH:1]>>[c:1]CC',
@@ -38,7 +34,6 @@ def level_function(fragments):
                         except Exception:
                             continue
 
-        # Step 2: 过滤 PAINS
         filtered = []
         for smi in candidates:
             mol = Chem.MolFromSmiles(smi)
@@ -47,7 +42,6 @@ def level_function(fragments):
             if catalog.GetFirstMatch(mol) is None:
                 filtered.append(smi)
 
-        # Step 3: 按 LogP 排序 (最接近 2~3 的优先)
         results = []
         for smi in filtered:
             mol = Chem.MolFromSmiles(smi)
@@ -63,11 +57,3 @@ def level_function(fragments):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    frags = ["c1ccncc1", "c1ccccc1", "c1ccc2[nH]ccc2c1"]
-    result = level_function(frags)
-    if result:
-        for r in result[:5]:
-            print(f"  {r['smiles']}: LogP={r['logp']}")

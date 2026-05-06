@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
-
 def level_function(mols):
-    """给定一组分子，进行 Pareto 优化（目标：LogP ~2，TPSA < 120）。"""
     try:
         mol_data = []
         for smi in mols:
@@ -16,10 +14,8 @@ def level_function(mols):
                 'smiles': Chem.MolToSmiles(mol),
                 'logp': round(logp, 2),
                 'tpsa': round(tpsa, 2),
-                'logp_dist': round(abs(logp - 2), 2)  # 离目标 LogP=2 的距离
             })
 
-        # Pareto 前沿: 对两个目标 (logp_dist 越小越好, tpsa 越小越好)
         pareto_front = []
         for i, d in enumerate(mol_data):
             dominated = False
@@ -38,12 +34,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = ["CCO", "c1ccccc1", "CC(=O)O", "c1ccc(O)cc1",
-                   "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O", "c1ccncc1"]
-    result = level_function(smiles_list)
-    if result:
-        for r in result:
-            print(f"  {r['smiles']}: LogP={r['logp']}, TPSA={r['tpsa']}")

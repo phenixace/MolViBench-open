@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
-
 def level_function(target_mw_min=200, target_mw_max=250):
-    """给定目标分子量范围 [200,250] → 从苯出发 → 逐步添加取代基 → 若分子量超出范围则回退一步尝试其他基团 → 找到一个满足范围的分子。"""
     try:
         start_mol = Chem.MolFromSmiles("c1ccccc1")
 
@@ -56,10 +54,3 @@ def level_function(target_mw_min=200, target_mw_max=250):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    result = level_function(200, 250)
-    if result:
-        print(f"Final: {result['final_smiles']}, MW: {result['final_MW']}")
-        print(f"Steps: {result['steps']}")

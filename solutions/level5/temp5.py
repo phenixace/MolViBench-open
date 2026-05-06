@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import rdFMCS
 
-
 def level_function(mols):
-    """给定一组分子，提取它们的共同子结构 scaffold。"""
     try:
         mol_objs = []
         for smi in mols:
@@ -14,7 +12,6 @@ def level_function(mols):
         if len(mol_objs) < 2:
             return None
 
-        # Find Maximum Common Substructure
         mcs_result = rdFMCS.FindMCS(
             mol_objs,
             threshold=0.8,
@@ -24,7 +21,6 @@ def level_function(mols):
         )
 
         if mcs_result.canceled:
-            # Retry with less strict parameters
             mcs_result = rdFMCS.FindMCS(
                 mol_objs,
                 threshold=0.7,
@@ -35,7 +31,6 @@ def level_function(mols):
         if not mcs_smarts:
             return None
 
-        # Try to convert SMARTS to SMILES for readability
         mcs_mol = Chem.MolFromSmarts(mcs_smarts)
         mcs_smiles = None
         if mcs_mol is not None:
@@ -53,13 +48,3 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles_list = [
-        "c1ccc(CC(=O)O)cc1",
-        "c1ccc(CCC(=O)O)cc1",
-        "c1ccc(C(=O)O)cc1",
-    ]
-    result = level_function(smiles_list)
-    print(f"result: {result}")

@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-
 def level_function(mol):
-    """生成多个构象并筛选最低能量。"""
     try:
         mol = Chem.MolFromSmiles(mol)
         if mol is None:
@@ -31,9 +29,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    smiles = "c1ccccc1CCO"
-    result = level_function(smiles)
-    print(f"最低能量构象: {result}")

@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, FindMolChiralCenters
 
-
 def level_function(mol):
-    """预测反应的 stereoselectivity。"""
     try:
         molecule = Chem.MolFromSmiles(mol)
         if molecule is None:
@@ -36,8 +34,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    mol = "CC(=O)CC"
-    print(f"Stereoselectivity 预测: {level_function(mol)}")

@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers, StereoEnumerationOptions
 
-
 def level_function(mol):
-    """给定分子，生成所有可能的异构体。"""
     try:
         molecule = Chem.MolFromSmiles(mol)
         if molecule is None:
@@ -22,8 +20,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    mol = "CC(O)CC(Cl)C"
-    print(f"所有可能的异构体: {level_function(mol)}")

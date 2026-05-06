@@ -3,25 +3,21 @@ from rdkit.Chem import AllChem, rdMolDescriptors
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
 def level_function(mol):
-    """给定分子 → 计算原子数 → 如果 >20 → 删除侧链 → 计算新分子量。"""
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
 
-        # Step 1: 计算原子数（重原子数）
         num_atoms = mol_obj.GetNumAtoms()
         has_many_atoms = num_atoms > 20
 
         if not has_many_atoms:
             return None
 
-        # Step 2: 删除侧链（获取 Murcko 骨架）
         scaffold = MurckoScaffold.GetScaffoldForMol(mol_obj)
         Chem.SanitizeMol(scaffold)
         scaffold_smiles = Chem.MolToSmiles(scaffold)
 
-        # Step 3: 计算新分子量
         mol_wt = rdMolDescriptors.CalcExactMolWt(scaffold)
 
         return {
@@ -32,7 +28,3 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
-
-if __name__ == "__main__":
-    smiles = "CC(C)Cc1ccc(C(C)C(=O)O)cc1"
-    print(f"result: {level_function(smiles)}")

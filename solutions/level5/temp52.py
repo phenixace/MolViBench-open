@@ -1,9 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import BRICS, Descriptors
 
-
 def level_function(smiles_list, max_products=200):
-    """使用 BRICS 切割一组分子为片段 → 重新组合片段生成新分子 → 过滤无效分子 → 评估新分子的药物性（QED）。"""
     try:
         mols = []
         for smi in smiles_list:
@@ -14,13 +12,11 @@ def level_function(smiles_list, max_products=200):
         if not mols:
             return None
 
-        # BRICS decomposition
         all_frags = set()
         for mol in mols:
             frags = BRICS.BRICSDecompose(mol)
             all_frags.update(frags)
 
-        # Parse fragment molecules
         frag_mols = []
         for frag_smi in all_frags:
             frag_mol = Chem.MolFromSmiles(frag_smi)
@@ -30,7 +26,6 @@ def level_function(smiles_list, max_products=200):
         if len(frag_mols) < 2:
             return None
 
-        # BRICS Build
         builder = BRICS.BRICSBuild(frag_mols, maxDepth=1)
         products = set()
         original_set = set(Chem.MolToSmiles(m) for m in mols)
@@ -48,7 +43,6 @@ def level_function(smiles_list, max_products=200):
             except Exception:
                 continue
 
-        # Evaluate QED
         scored = []
         for smi in products:
             mol = Chem.MolFromSmiles(smi)
@@ -73,11 +67,3 @@ def level_function(smiles_list, max_products=200):
     except Exception as e:
         print(e)
         return None
-
-
-if __name__ == "__main__":
-    mols = ["c1ccc(NC(=O)C)cc1", "c1ccc(OC)cc1", "c1ccncc1CC(=O)O"]
-    result = level_function(mols)
-    if result:
-        print(f"Fragments: {result['fragments']}, New mols: {result['new_molecules']}")
-        print(f"Avg QED: {result['avg_QED']}")
