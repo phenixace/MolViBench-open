@@ -14,7 +14,7 @@ MolViBench comprises **358 curated tasks** across five cognitive levels (followi
 
 ## Overview
 
-- **358 tasks** (CN/EN) across **5 difficulty levels**
+- **358 tasks** (EN/CN) across **5 difficulty levels**
 - **Reference solutions** for all tasks
 - **Automated evaluation framework** with type-aware output comparison and AST-based API-semantic fallback analysis
 
@@ -39,31 +39,31 @@ All tasks are restricted to **RDKit** as the primary cheminformatics library, wi
 Validate that all reference solutions can run:
 
 ```bash
-python test.py --validate-solutions --lang cn
+python test.py --validate-solutions --lang en
 ```
 
 Generate a ground-truth cache:
 
 ```bash
-python test.py --generate-ground-truth --lang cn --n-test 10
+python test.py --generate-ground-truth --lang en --n-test 10
 ```
 
 Evaluate all levels (expects predictions in `predictions/`):
 
 ```bash
-python test.py --all --lang cn
+python test.py --all --lang en
 ```
 
 Evaluate a single level or question:
 
 ```bash
-python test.py --level 1 --lang cn
-python test.py --level 1 --question 5 --lang cn
+python test.py --level 1 --lang en
+python test.py --level 1 --question 5 --lang en
 ```
 
 ## Data
 
-- Task CSVs: `data/cn/level{1..5}.csv`, `data/en/level{1..5}.csv`
+- Task CSVs: `data/en/level{1..5}.csv`, `data/cn/level{1..5}.csv`
 - Each task specifies a natural-language instruction; the model must generate a self-contained `level_function()` that processes molecular inputs and returns a chemically meaningful result.
 
 ## Inference Paradigms
