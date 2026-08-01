@@ -61,6 +61,28 @@ python test.py --level 1 --lang en
 python test.py --level 1 --question 5 --lang en
 ```
 
+### Scoring cascade
+
+The evaluator applies the following decision order to each generated program:
+
+1. A program that does not execute fails and cannot be rescued by API overlap.
+2. Every executable output first receives type-aware value comparison.
+3. If the expert solution contains a stochastic construct, a value mismatch is
+   checked structurally (container/schema, numeric fields, and molecular-string
+   validity). This branch does not use API overlap.
+4. Only an executable result that remains intrinsically non-comparable (for
+   example, image/SVG, conformer, RDKit `Mol`, array, or file/in-memory
+   representation differences) can enter the strict AST/API-semantic fallback
+   at `tau=0.5`. Stage-2 passes plus this narrow branch define **Main Pass@1**.
+5. API coverage at `tau=0.7` is also reported for all executable Stage-2
+   failures as a broader workflow-coverage diagnostic; it does not change Main
+   Pass@1.
+
+The JSON report preserves the legacy Stage-2 `pass@1` field and additionally
+reports `main_pass@1` (alias `pass@1_combined`) and `fallback_pass@1` (alias
+`pass@1_fallback`). Per-question records state whether exact, structural, strict
+API, or diagnostic evaluation was used.
+
 ## Data
 
 - Task CSVs: `data/en/level{1..5}.csv`, `data/cn/level{1..5}.csv`
@@ -80,12 +102,51 @@ Three paradigms for querying LLMs (all support OpenAI-compatible APIs):
 # DG — Direct Generation
 python inference_dg.py --base-url https://api.openai.com/v1 --api-key sk-xxx --model gpt-4o
 
+# DG temperature sweep (reads the key without exposing it in the process list)
+python inference_dg.py --base-url https://api.openai.com/v1 --api-key-file key.txt \
+  --model gpt-4o --temperatures 0.3 0.7 1.0 --seed 42
+
 # IR — Incremental Repair (3 rounds)
 python inference_ir.py --base-url https://api.openai.com/v1 --api-key sk-xxx --model gpt-4o --max-rounds 3
 
 # AC — Agent Collaboration
 python inference_ac.py --base-url https://api.openai.com/v1 --api-key sk-xxx --model gpt-4o
 ```
+
+### API-semantic evaluation
+
+The API-semantic judge makes one API request per solution and reports two
+decisions separately: whether the candidate solves the task, and whether it is
+functionally equivalent to the reference implementation.
+
+Its defaults are locked to `op-4.7` at `https://apicursor.com/v1`, read the key
+from `key.txt`, and select only
+`predictions/prev_predictions/*_en_basic` directories while excluding every
+model name containing `glm`. Inspect the exact scope without making requests:
+
+```bash
+python api_semantic_eval.py --dry-run
+```
+
+Run with 30 concurrent single-solution requests:
+
+```bash
+python api_semantic_eval.py --yes --concurrency 30
+```
+
+Select the paper's English Incremental Repair or Agent Collaboration outputs
+without changing the one-solution-per-request behavior:
+
+```bash
+python api_semantic_eval.py --variant ir --yes --concurrency 30
+python api_semantic_eval.py --variant ac --yes --concurrency 30
+```
+
+Every completed judgment is appended to a JSONL checkpoint. Re-running the
+same command resumes unfinished/API-error items without requesting successful
+items again. The consolidated report is written to
+`results/api_semantic_prev_predictions_en_basic_op-4.7.json`, with a compact
+per-model comparison in the adjacent `_summary.csv` file.
 
 ### Hyperparameters
 
