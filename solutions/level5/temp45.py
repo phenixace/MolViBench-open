@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, Descriptors
 
+
 def level_function(scaffold, n_modifications=10):
+
     try:
         scaffold_mol = Chem.MolFromSmiles(scaffold)
         if scaffold_mol is None:
@@ -9,13 +11,14 @@ def level_function(scaffold, n_modifications=10):
 
         scaffold_fp = AllChem.GetMorganFingerprintAsBitVect(scaffold_mol, 2, nBits=2048)
 
+
         rxns = [
             ('[cH:1]>>[c:1]C', 'Methyl'),
             ('[cH:1]>>[c:1]CC', 'Ethyl'),
             ('[cH:1]>>[c:1]O', 'Hydroxyl'),
             ('[cH:1]>>[c:1]OC', 'Methoxy'),
-            ('[cH:1]>>[c:1]F', 'Fluorine'),
-            ('[cH:1]>>[c:1]Cl', 'Chlorine'),
+            ('[cH:1]>>[c:1]F', 'Fluoro'),
+            ('[cH:1]>>[c:1]Cl', 'Chloro'),
             ('[cH:1]>>[c:1]N', 'Amino'),
             ('[cH:1]>>[c:1]NC(=O)C', 'Amide'),
             ('[cH:1]>>[c:1]C(F)(F)F', 'Trifluoromethyl'),
@@ -36,6 +39,7 @@ def level_function(scaffold, n_modifications=10):
                             continue
                         seen.add(smi)
 
+
                         qed = Descriptors.qed(product)
                         if qed > 0.7:
                             fp = AllChem.GetMorganFingerprintAsBitVect(product, 2, nBits=2048)
@@ -54,3 +58,10 @@ def level_function(scaffold, n_modifications=10):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    scaffold = 'O=C(O)c1ccccc1O'
+    result = level_function(scaffold)
+    if result:
+        for r in result[:5]:
+            print(f"Output: {r['smiles']}{r['qed']}{r['similarity_to_scaffold']}")

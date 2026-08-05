@@ -1,17 +1,21 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(mol):
+
     try:
         mol = Chem.MolFromSmiles(mol)
         if mol is None:
             return None
         mol = Chem.AddHs(mol)
-        cids = AllChem.EmbedMultipleConfs(mol, numConfs=10, randomSeed=42)
+        if mol.GetNumHeavyAtoms() > 50:
+            return None
+        cids = AllChem.EmbedMultipleConfs(mol, numConfs=10, randomSeed=42, maxAttempts=5)
         if len(cids) == 0:
             return None
         for cid in cids:
-            AllChem.MMFFOptimizeMolecule(mol, confId=cid)
+            AllChem.MMFFOptimizeMolecule(mol, confId=cid, maxIters=100)
         cid_list = list(cids)
         n = len(cid_list)
         matrix = [[0.0] * n for _ in range(n)]
@@ -24,3 +28,12 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1CCO'
+    result = level_function(smiles)
+    if result:
+        print(f'Output: {len(result)}{len(result)}')
+        for row in result:
+            print('Output:', [f'{v:.3f}' for v in row])

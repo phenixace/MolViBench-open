@@ -3,12 +3,15 @@ from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem, Descriptors, Crippen, FilterCatalog
 from rdkit.ML.Cluster import Butina
 
+
 def level_function(query_smiles, library_smiles, top_n=100, cluster_cutoff=0.4):
+
     try:
         query_mol = Chem.MolFromSmiles(query_smiles)
         if query_mol is None:
             return None
         query_fp = AllChem.GetMorganFingerprintAsBitVect(query_mol, 2, nBits=2048)
+
 
         candidates = []
         for smi in library_smiles:
@@ -26,9 +29,12 @@ def level_function(query_smiles, library_smiles, top_n=100, cluster_cutoff=0.4):
 
         n_parsed = len(candidates)
 
+
         candidates.sort(key=lambda x: x["similarity"], reverse=True)
         candidates = candidates[:top_n]
         n_top = len(candidates)
+
+
 
         admet_pass = []
         for c in candidates:
@@ -51,6 +57,7 @@ def level_function(query_smiles, library_smiles, top_n=100, cluster_cutoff=0.4):
                 admet_pass.append(c)
         n_admet = len(admet_pass)
 
+
         pains_params = FilterCatalog.FilterCatalogParams()
         pains_params.AddCatalog(FilterCatalog.FilterCatalogParams.FilterCatalogs.PAINS)
         pains_catalog = FilterCatalog.FilterCatalog(pains_params)
@@ -72,6 +79,7 @@ def level_function(query_smiles, library_smiles, top_n=100, cluster_cutoff=0.4):
                 "representatives": [],
             }
 
+
         fps = [c["fp"] for c in clean]
         n = len(fps)
         dists = []
@@ -80,6 +88,7 @@ def level_function(query_smiles, library_smiles, top_n=100, cluster_cutoff=0.4):
                 dists.append(1.0 - DataStructs.TanimotoSimilarity(fps[i], fps[j]))
 
         clusters = Butina.ClusterData(dists, n, cluster_cutoff, isDistData=True)
+
 
         representatives = []
         for cluster in clusters:
@@ -113,3 +122,13 @@ def level_function(query_smiles, library_smiles, top_n=100, cluster_cutoff=0.4):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    query = 'c1ccc(NC(=O)c2ccccc2)cc1'
+    library = ['c1ccc(NC(=O)c2ccccc2)cc1', 'c1ccc(NC(=O)c2ccncc2)cc1', 'c1ccc(NC(=O)c2ccc(F)cc2)cc1', 'c1ccc(NC(=O)C)cc1', 'c1ccc(NC(=O)CC)cc1', 'c1ccc(O)cc1', 'c1ccc(N)cc1', 'CC(=O)Oc1ccccc1C(=O)O', 'c1ccc2c(c1)cc1ccccc12', 'c1ccc(CC(=O)O)cc1', 'CC(C)Cc1ccc(C(C)C(=O)O)cc1']
+    result = level_function(query, library, top_n=10)
+    if result:
+        print(f"Output: {result['pipeline_summary']}")
+        for r in result['representatives'][:5]:
+            print(f"Output: {r['smiles']}{r['similarity']}{r['QED']}")

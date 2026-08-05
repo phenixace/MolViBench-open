@@ -1,62 +1,67 @@
 from rdkit import Chem
-from rdkit.Chem import BRICS, AllChem, DataStructs
+from rdkit.Chem import AllChem, Descriptors, Crippen, DataStructs, rdMolDescriptors
+import random
 
-def level_function(fragment_smiles_list, target_smiles):
-    try:
-        target_mol = Chem.MolFromSmiles(target_smiles)
-        if target_mol is None:
-            return None
-        target_fp = AllChem.GetMorganFingerprintAsBitVect(target_mol, 2, nBits=2048)
+def level_function(mol_smi, iterations=15, seed=42):
+    random.seed(seed)
+    current_mol = Chem.MolFromSmiles(mol_smi)
+    if not current_mol: return None
 
-        frag_mols = []
-        for smi in fragment_smiles_list:
-            mol = Chem.MolFromSmiles(smi)
-            if mol:
-                frag_mols.append(mol)
+    orig_fp = AllChem.GetMorganFingerprintAsBitVect(current_mol, 2, nBits=2048)
 
-        if len(frag_mols) < 2:
-            return None
+    replacements = [
+        ('[CX4H3:1]>>[*:1]O', 'Hydroxyl'),
+        ('[CX4H3:1]>>[*:1]C(=O)O', 'Carboxyl'),
+        ('[CX4H3:1]>>[*:1]C(=O)N', 'Amide'),
+        ('[CX4H3:1]>>[*:1]S(=O)(=O)C', 'Methylsulfonyl'),
+        ('[CX4H2:1]>>[*:1][NH1]', 'Introduce an amino group into the chain'),
+        ('[CX4H2:1]>>[*:1]O', 'Introduce an ether linkage into the chain'),
+        ('[H:1][c:2]>>[c:2]F', 'Fluorination (increase metabolic stability)')
+    ]
 
-        all_frags = [Chem.MolToSmiles(m) for m in frag_mols]
-        built = set()
+    def get_detailed_score(m):
+        m.UpdatePropertyCache(strict=False)
+        mw = Descriptors.MolWt(m)
+        logp = Crippen.MolLogP(m)
+        violations = sum([mw >= 500, logp >= 5])
+        score = (violations * 100) + abs(logp - 2.0)
+        return score, {"MW": round(mw, 2), "LogP": round(logp, 2), "Violations": violations}
+
+    current_score, current_props = get_detailed_score(current_mol)
+
+    for i in range(iterations):
+        rxn_smarts, label = random.choice(replacements)
+        rxn = AllChem.ReactionFromSmarts(rxn_smarts)
+
+        products = rxn.RunReactants((current_mol,))
+        if not products: continue
+
+        test_mol = random.choice(products)[0]
+
         try:
-            builder = BRICS.BRICSBuild(frag_mols, maxDepth=1)
-            for prod in builder:
-                try:
-                    Chem.SanitizeMol(prod)
-                    smi = Chem.MolToSmiles(prod)
-                    built.add(smi)
-                        break
-                except Exception:
-                    continue
-        except Exception:
-            pass
+            Chem.SanitizeMol(test_mol)
 
-        if not built:
-            return None
+            new_fp = AllChem.GetMorganFingerprintAsBitVect(test_mol, 2, nBits=2048)
+            sim = DataStructs.TanimotoSimilarity(orig_fp, new_fp)
 
-        best_smi = None
-        best_sim = -1
-        results = []
-        for smi in built:
-            mol = Chem.MolFromSmiles(smi)
-            if mol is None:
-                continue
-            fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=2048)
-            sim = DataStructs.TanimotoSimilarity(target_fp, fp)
-            results.append({"smiles": smi, "similarity": round(sim, 4)})
-            if sim > best_sim:
-                best_sim = sim
-                best_smi = smi
+            if sim < 0.5: continue
 
-        results.sort(key=lambda x: x["similarity"], reverse=True)
+            new_score, new_props = get_detailed_score(test_mol)
 
-        return {
-            "total_valid": len(results),
-            "best_match": best_smi,
-            "best_similarity": round(best_sim, 4),
-            "top5": results[:5]
-        }
-    except Exception as e:
-        print(e)
-        return None
+            if new_score < current_score:
+                current_mol = test_mol
+                current_score = new_score
+                current_props = new_props
+        except:
+            continue
+
+    return {
+        "final_smiles": Chem.MolToSmiles(current_mol),
+        "final_props": current_props,
+        "similarity": round(DataStructs.TanimotoSimilarity(orig_fp, AllChem.GetMorganFingerprintAsBitVect(current_mol, 2)), 4)
+    }
+
+if __name__ == '__main__':
+    input_smi = 'c1ccc(CCCCCCC)cc1'
+    result = level_function(input_smi)
+    print(f'Output: {result}')

@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
+
 def level_function(fragment, linkers=None):
+
     try:
         frag_mol = Chem.MolFromSmiles(fragment)
         if frag_mol is None:
@@ -10,7 +12,9 @@ def level_function(fragment, linkers=None):
         if linkers is None:
             linkers = ["CC", "CCC", "CCO", "CCNC", "C(=O)"]
 
+
         candidates = set()
+
 
         growth_rxns = [
             '[cH:1]>>[c:1]CC',
@@ -33,6 +37,7 @@ def level_function(fragment, linkers=None):
                     except Exception:
                         continue
 
+
         filtered = []
         for smi in candidates:
             mol = Chem.MolFromSmiles(smi)
@@ -41,6 +46,7 @@ def level_function(fragment, linkers=None):
             logp = Descriptors.MolLogP(mol)
             if 2 <= logp <= 4:
                 filtered.append({'smiles': smi, 'logp': round(logp, 2), 'mol': mol})
+
 
         results = []
         for item in filtered:
@@ -56,3 +62,11 @@ def level_function(fragment, linkers=None):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    frag = 'c1ccncc1'
+    result = level_function(frag)
+    if result:
+        for r in result[:5]:
+            print(f"Output: {r['smiles']}{r['logp']}{r['qed']}")

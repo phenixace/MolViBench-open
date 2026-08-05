@@ -3,11 +3,14 @@ from rdkit.Chem import AllChem, Descriptors
 import sys
 import os
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         rxn_templates = [
             '[cH:1]>>[c:1]C',
@@ -31,6 +34,7 @@ def level_function(mol):
                     except Exception:
                         pass
 
+
         lipinski_pass = []
         for smi in derivatives:
             m = Chem.MolFromSmiles(smi)
@@ -46,12 +50,14 @@ def level_function(mol):
         if not lipinski_pass:
             return {"derivatives_total": len(derivatives), "lipinski_pass": 0, "top3": []}
 
+
         try:
             from rdkit.Chem import RDConfig
             sys.path.append(os.path.join(RDConfig.RDContribDir, 'SA_Score'))
             import sascorer
             sa_func = sascorer.calculateScore
         except Exception:
+
             sa_func = lambda m: Descriptors.BertzCT(m) / 100.0
 
         scored = []
@@ -69,3 +75,12 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['derivatives_total']}{result['lipinski_pass']}")
+        for r in result['top3']:
+            print(f"Output: {r['smiles']}{r['SA_Score']}")

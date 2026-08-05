@@ -2,8 +2,11 @@ from rdkit import Chem
 from rdkit.Chem import Descriptors
 import pandas as pd
 
+
 def level_function(smiles_list):
+
     try:
+
         valid = {}
         for smi in smiles_list:
             mol = Chem.MolFromSmiles(smi)
@@ -14,6 +17,7 @@ def level_function(smiles_list):
 
         if not valid:
             return None
+
 
         rows = []
         for smi, mol in valid.items():
@@ -37,3 +41,11 @@ def level_function(smiles_list):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    mols = ['CCO', 'c1ccccc1', 'CCO', 'INVALID', 'CC(=O)Nc1ccccc1', 'c1ccc(O)cc1', 'c1ccccc1']
+    result = level_function(mols)
+    if result:
+        print(f"Output: {result['valid_unique']}")
+        print('Output:', result['csv_string'][:500])

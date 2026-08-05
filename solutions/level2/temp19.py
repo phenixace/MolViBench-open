@@ -2,14 +2,22 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 def level_function(mol):
+
+
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
         mol_h = Chem.AddHs(mol_obj)
-        result = AllChem.EmbedMolecule(mol_h, AllChem.ETKDG())
+        if mol_h.GetNumHeavyAtoms() > 50:
+            return None
+
+        result = AllChem.EmbedMolecule(mol_h, AllChem.ETKDG(), maxAttempts=5)
         if result == -1:
             return None
+
         conf = mol_h.GetConformer()
         coords = []
         for i in range(mol_h.GetNumAtoms()):
@@ -19,3 +27,10 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    smiles = 'CCO'
+    result = level_function(smiles)
+    if result:
+        for atom_symbol, x, y, z in result:
+            print(f'Output: {atom_symbol}{x:.4f}{y:.4f}{z:.4f}')

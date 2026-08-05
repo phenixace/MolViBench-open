@@ -3,7 +3,52 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from evaluate.evaluator import EvalConfig, evaluate_single
+from evaluate.evaluator import (
+    EvalConfig,
+    evaluate_single,
+    is_nondeterministic_solution,
+)
+from evaluate.executor import execute_function_direct, execute_function_subprocess
+
+
+class ExecutorSeedTests(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.program = Path(self.temp_dir.name) / "random_program.py"
+        self.program.write_text(
+            "import random\n"
+            "import numpy as np\n\n"
+            "def level_function(seed=None):\n"
+            "    return [random.random(), float(np.random.RandomState(seed).rand())]\n",
+            encoding="utf-8",
+        )
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_seed_reproduces_direct_and_subprocess_outputs(self):
+        direct_a = execute_function_direct(
+            str(self.program), "level_function", [], {}, seed=123
+        )
+        direct_b = execute_function_direct(
+            str(self.program), "level_function", [], {}, seed=123
+        )
+        direct_c = execute_function_direct(
+            str(self.program), "level_function", [], {}, seed=124
+        )
+        subprocess_a = execute_function_subprocess(
+            str(self.program), "level_function", [], {}, seed=123
+        )
+        subprocess_b = execute_function_subprocess(
+            str(self.program), "level_function", [], {}, seed=123
+        )
+
+        for result in (direct_a, direct_b, direct_c, subprocess_a, subprocess_b):
+            self.assertTrue(result["success"], result.get("error"))
+        self.assertEqual(direct_a["output"], direct_b["output"])
+        self.assertNotEqual(direct_a["output"], direct_c["output"])
+        self.assertEqual(subprocess_a["output"], subprocess_b["output"])
+        self.assertEqual(direct_a["output"], subprocess_a["output"])
 
 
 class EvaluatorFallbackTests(unittest.TestCase):
@@ -44,6 +89,15 @@ class EvaluatorFallbackTests(unittest.TestCase):
             }
 
         return fake_execute
+
+    def test_maxmin_diversity_task_is_treated_as_multi_solution(self):
+        solution = self.root / "level5" / "temp36.py"
+        solution.parent.mkdir()
+        solution.write_text(
+            "def level_function():\n    return []\n",
+            encoding="utf-8",
+        )
+        self.assertTrue(is_nondeterministic_solution(str(solution)))
 
     @patch("evaluate.evaluator.api_fallback_check")
     @patch("evaluate.evaluator.infer_test_inputs", return_value=[([], {})])

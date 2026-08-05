@@ -2,14 +2,19 @@ import numpy as np
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 
+
 def level_function(train_smiles, new_smiles, fp_radius=2, fp_bits=2048, threshold_percentile=95):
+
     try:
+
         train_mols = [Chem.MolFromSmiles(s) for s in train_smiles]
         train_mols = [m for m in train_mols if m is not None]
         if len(train_mols) < 3:
             return None
 
         train_fps = [AllChem.GetMorganFingerprintAsBitVect(m, fp_radius, nBits=fp_bits) for m in train_mols]
+
+
 
         train_nn_dists = []
         for i in range(len(train_fps)):
@@ -24,9 +29,12 @@ def level_function(train_smiles, new_smiles, fp_radius=2, fp_bits=2048, threshol
 
         train_nn_dists = np.array(train_nn_dists)
 
+
+
         mean_dist = float(np.mean(train_nn_dists))
         std_dist = float(np.std(train_nn_dists))
         threshold = float(np.percentile(train_nn_dists, threshold_percentile))
+
 
         train_fp_arrays = np.array([list(fp) for fp in train_fps], dtype=float)
         centroid = np.mean(train_fp_arrays, axis=0)
@@ -36,6 +44,7 @@ def level_function(train_smiles, new_smiles, fp_radius=2, fp_bits=2048, threshol
 
         train_centroid_dists = [centroid_distance(fp_arr) for fp_arr in train_fp_arrays]
         centroid_threshold = float(np.percentile(train_centroid_dists, threshold_percentile))
+
 
         results = []
         for smi in new_smiles:
@@ -51,10 +60,13 @@ def level_function(train_smiles, new_smiles, fp_radius=2, fp_bits=2048, threshol
 
             fp = AllChem.GetMorganFingerprintAsBitVect(mol, fp_radius, nBits=fp_bits)
 
+
             nn_dist = min(1.0 - DataStructs.TanimotoSimilarity(fp, tfp) for tfp in train_fps)
+
 
             fp_arr = np.array(list(fp), dtype=float)
             c_dist = centroid_distance(fp_arr)
+
 
             nn_in_ad = nn_dist <= threshold
             centroid_in_ad = c_dist <= centroid_threshold
@@ -93,3 +105,14 @@ def level_function(train_smiles, new_smiles, fp_radius=2, fp_bits=2048, threshol
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    train = ['c1ccccc1', 'c1ccc(O)cc1', 'c1ccc(N)cc1', 'c1ccc(F)cc1', 'c1ccc(Cl)cc1', 'c1ccc(Br)cc1', 'c1ccc(C)cc1', 'c1ccc(OC)cc1', 'c1ccc(C(=O)O)cc1', 'c1ccc(C#N)cc1']
+    new = ['c1ccc(CC)cc1', 'c1ccncc1', 'C1CC2CCC3CCCC4CCCCC4C3C2C1', 'CCCCCCCCCCCCCC']
+    result = level_function(train, new)
+    if result:
+        print(f"Output: {result['training_set']}")
+        print(f"Output: {result['evaluation']}")
+        for r in result['molecule_results']:
+            print(f"Output: {r['smiles']}{r.get('in_AD')}{r.get('nn_distance')}")

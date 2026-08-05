@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
+
 def level_function(mol):
+
     try:
         frag = Chem.MolFromSmiles(mol)
         if frag is None:
@@ -10,6 +12,7 @@ def level_function(mol):
         original_smi = Chem.MolToSmiles(frag)
         derivatives = set()
 
+
         growth_groups = [
             ('methyl', 6, None),
             ('amino', 7, None),
@@ -17,6 +20,7 @@ def level_function(mol):
             ('fluoro', 9, None),
             ('chloro', 17, None),
         ]
+
 
         growth_reactions = [
             ('ethyl', '[*:1]([H])>>[*:1]CC'),
@@ -30,6 +34,7 @@ def level_function(mol):
             ('morpholine', '[cH1:1]>>[c:1]N1CCOCC1'),
             ('piperidine', '[cH1:1]>>[c:1]N1CCCCC1'),
         ]
+
 
         for atom_idx in range(frag.GetNumAtoms()):
             atom = frag.GetAtomWithIdx(atom_idx)
@@ -45,6 +50,7 @@ def level_function(mol):
                             derivatives.add(new_smi)
                     except Exception:
                         pass
+
 
         for name, rxn_smarts in growth_reactions:
             try:
@@ -62,6 +68,7 @@ def level_function(mol):
             except Exception:
                 pass
 
+
         result = []
         for smi in derivatives:
             m = Chem.MolFromSmiles(smi)
@@ -74,3 +81,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('c1ccncc1')
+    print(f'Output: {result}')

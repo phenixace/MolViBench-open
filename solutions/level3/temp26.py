@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(mol):
+
     try:
         molecule = Chem.MolFromSmiles(mol)
         if molecule is None:
@@ -29,3 +31,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'CCC'
+    print(f'Output: {level_function(smiles)}')

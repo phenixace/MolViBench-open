@@ -1,5 +1,7 @@
 from rdkit import Chem
 
+
+
 BRENK_ALERTS = {
     "aldehyde": "[CH1](=O)",
     "epoxide": "C1OC1",
@@ -23,11 +25,14 @@ BRENK_ALERTS = {
     "triflate": "OS(=O)(=O)C(F)(F)F",
     "acetal": "C(O)(O)",
     "enol_ether": "C=CO",
+    "polycyclic_aromatic_gt3": "c1ccc2c(c1)ccc1ccccc12",
     "alpha_halo_ketone": "C(=O)C[F,Cl,Br,I]",
     "mustard": "ClCCN",
 }
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -49,3 +54,11 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc([N+](=O)[O-])cc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['alerts']}")
+        print(f"Output: {result['passes_Brenk']}")

@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(reactants_list1, reactants_list2, reaction_smarts):
+
     try:
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
         if rxn is None:
@@ -32,3 +34,14 @@ def level_function(reactants_list1, reactants_list2, reaction_smarts):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    rxn = '[C:1](=[O:2])O.[N:3]>>[C:1](=[O:2])[N:3]'
+    acids = ['CC(=O)O', 'c1ccc(C(=O)O)cc1']
+    amines = ['CN', 'CCN', 'c1ccc(N)cc1']
+    result = level_function(acids, amines, rxn)
+    print(f'Output: {(len(result) if result else 0)}')
+    if result:
+        for smi in result:
+            print(f'Output: {smi}')

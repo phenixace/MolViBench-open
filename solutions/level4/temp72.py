@@ -2,7 +2,9 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, Crippen, rdMolDescriptors
 from itertools import product
 
+
 def level_function(core_smiles, rgroup_dict, top_k=5):
+
     try:
         core = Chem.MolFromSmiles(core_smiles)
         if core is None:
@@ -28,6 +30,7 @@ def level_function(core_smiles, rgroup_dict, top_k=5):
             except Exception:
                 pass
 
+
         scored = []
         for smi in all_products:
             mol = Chem.MolFromSmiles(smi)
@@ -52,3 +55,13 @@ def level_function(core_smiles, rgroup_dict, top_k=5):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    core = '[*:1]c1ccc([*:2])cc1[*:3]'
+    rgroups = {1: ['C', 'CC', 'F'], 2: ['O', 'N', 'Cl'], 3: ['C', 'OC']}
+    result = level_function(core, rgroups, top_k=5)
+    if result:
+        print(f"Output: {result['total_enumerated']}{result['lipinski_pass']}")
+        for r in result['top_k']:
+            print(f"Output: {r['smiles']}{r['QED']}")

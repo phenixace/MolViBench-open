@@ -1,5 +1,7 @@
 from rdkit import Chem
 
+
+
 AMES_ALERTS = {
     "aromatic_amine": "[NH2]c",
     "nitroso": "N=O",
@@ -18,7 +20,9 @@ AMES_ALERTS = {
     "acyl_hydrazide": "C(=O)NN",
 }
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -40,3 +44,11 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(N)cc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['Ames_risk']}")
+        print(f"Output: {result['alerts']}")

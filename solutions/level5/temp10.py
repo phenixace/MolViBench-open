@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 
+
 def level_function(mols):
+
     try:
         mol_data = []
         for smi in mols:
@@ -17,6 +19,7 @@ def level_function(mols):
         n = len(mol_data)
         similarity_threshold = 0.4
 
+
         sim_matrix = []
         for i in range(n):
             row = []
@@ -27,6 +30,7 @@ def level_function(mols):
                     sim = DataStructs.TanimotoSimilarity(mol_data[i]['fp'], mol_data[j]['fp'])
                     row.append(sim)
             sim_matrix.append(row)
+
 
         clusters = []
         assigned = [False] * n
@@ -42,8 +46,11 @@ def level_function(mols):
                         assigned[j] = True
             clusters.append(cluster)
 
+
+
         representatives = []
         for cluster in clusters:
+
             best_idx = cluster[0]
             if len(cluster) > 1:
                 best_avg_sim = 0
@@ -58,3 +65,9 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['c1ccccc1', 'c1ccc(C)cc1', 'c1ccc(O)cc1', 'CCO', 'CCCO', 'CC(=O)O', 'c1ccncc1', 'c1ccc(F)cc1']
+    result = level_function(smiles_list)
+    print(f'Output: {result}')

@@ -2,17 +2,21 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, rdMolDescriptors
 from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers, StereoEnumerationOptions
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         pattern = Chem.MolFromSmarts('c1ccccc1')
         has_benzene = mol_obj.HasSubstructMatch(pattern)
 
         if not has_benzene:
             return None
+
 
         opts = StereoEnumerationOptions(unique=True)
         isomers = list(EnumerateStereoisomers(mol_obj, options=opts))
@@ -28,6 +32,7 @@ def level_function(mol):
                 isomer_smiles.append(smi)
                 fp = AllChem.GetMorganFingerprintAsBitVect(iso, 2, nBits=2048)
                 fps.append(fp)
+
 
         n = len(fps)
         matrix = [[0.0] * n for _ in range(n)]
@@ -48,3 +53,12 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(CC(F)Cl)cc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {len(result['isomers'])}")
+        for smi in result['isomers']:
+            print(f'Output: {smi}')

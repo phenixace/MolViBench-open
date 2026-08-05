@@ -2,8 +2,11 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, Lipinski
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
+
 def level_function(mols):
+
     try:
+
         scaffolds = []
         for smi in mols:
             mol = Chem.MolFromSmiles(smi)
@@ -19,6 +22,7 @@ def level_function(mols):
 
         if not scaffolds:
             return None
+
 
         rxns = [
             '[cH:1]>>[c:1]C',
@@ -42,6 +46,7 @@ def level_function(mols):
                         except Exception:
                             continue
 
+
         results = []
         for smi in derivatives:
             mol = Chem.MolFromSmiles(smi)
@@ -62,3 +67,11 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['CC(=O)Oc1ccccc1C(=O)O', 'c1ccc(O)cc1']
+    result = level_function(smiles_list)
+    if result:
+        for r in result[:5]:
+            print(f"Output: {r['smiles']}{r['mw']}{r['logp']}")

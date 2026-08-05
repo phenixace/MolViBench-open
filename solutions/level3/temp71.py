@@ -2,9 +2,12 @@ from rdkit import Chem
 from rdkit.Chem.Scaffolds import MurckoScaffold
 import random
 
+
 def level_function(smiles_list, test_ratio=0.2, random_seed=42):
+
     try:
         random.seed(random_seed)
+
 
         scaffold_to_mols = {}
         valid_smiles = []
@@ -25,12 +28,15 @@ def level_function(smiles_list, test_ratio=0.2, random_seed=42):
         if not valid_smiles:
             return None
 
+
         scaffolds = sorted(scaffold_to_mols.keys(),
                           key=lambda s: len(scaffold_to_mols[s]),
                           reverse=True)
 
+
         n_total = len(valid_smiles)
         n_test_target = int(n_total * test_ratio)
+
 
         scaffold_list = list(scaffolds)
         random.shuffle(scaffold_list)
@@ -59,3 +65,11 @@ def level_function(smiles_list, test_ratio=0.2, random_seed=42):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    mols = ['c1ccccc1O', 'c1ccccc1N', 'c1ccccc1F', 'c1ccncc1O', 'c1ccncc1N', 'CCCCO', 'CCCCN', 'CCCC(=O)O', 'c1ccc2ccccc2c1', 'c1ccc2ccccc2c1O']
+    result = level_function(mols, test_ratio=0.3, random_seed=42)
+    if result:
+        print(f"Output: {result['train_size']}{result['test_size']}")
+        print(f"Output: {result['num_scaffolds']}")

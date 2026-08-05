@@ -10,3 +10,7 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    smiles = 'CCO'
+    print(f'Output: {level_function(smiles)}')

@@ -2,10 +2,12 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, rdMolDescriptors
 
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         num_aromatic_rings = rdMolDescriptors.CalcNumAromaticRings(mol_obj)
         has_aromatic_ring = num_aromatic_rings > 0
@@ -13,12 +15,16 @@ def level_function(mol):
         if not has_aromatic_ring:
             return None
 
+
         mol_h = Chem.AddHs(mol_obj)
-        embed_result = AllChem.EmbedMolecule(mol_h, AllChem.ETKDG())
+        if mol_h.GetNumHeavyAtoms() > 50:
+            return None
+        embed_result = AllChem.EmbedMolecule(mol_h, AllChem.ETKDG(), maxAttempts=5)
         if embed_result == -1:
             return None
 
-        optimize_result = AllChem.MMFFOptimizeMolecule(mol_h)
+        optimize_result = AllChem.MMFFOptimizeMolecule(mol_h, maxIters=100)
+
 
         ff = AllChem.MMFFGetMoleculeForceField(mol_h, AllChem.MMFFGetMoleculeProperties(mol_h))
         if ff is None:
@@ -35,3 +41,7 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1'
+    print(f'Output: {level_function(smiles)}')

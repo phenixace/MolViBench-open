@@ -1,13 +1,18 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, Crippen, rdMolDescriptors, FilterCatalog
 
+
+
 BRENK_SMARTS = {
     "aldehyde": "[CH1](=O)", "epoxide": "C1OC1", "peroxide": "OO",
     "azide": "N=[N+]=[N-]", "disulfide": "SS", "nitro": "[N+](=O)[O-]",
 }
 
+
 def level_function(smiles_list):
+
     try:
+
         mols = []
         for smi in smiles_list:
             mol = Chem.MolFromSmiles(smi)
@@ -15,6 +20,7 @@ def level_function(smiles_list):
                 mols.append((Chem.MolToSmiles(mol), mol))
 
         stages = [{"stage": "input", "count": len(mols)}]
+
 
         lipinski_pass = []
         for smi, mol in mols:
@@ -26,6 +32,7 @@ def level_function(smiles_list):
                 lipinski_pass.append((smi, mol))
         stages.append({"stage": "Lipinski", "count": len(lipinski_pass)})
 
+
         veber_pass = []
         for smi, mol in lipinski_pass:
             rot = rdMolDescriptors.CalcNumRotatableBonds(mol)
@@ -33,6 +40,7 @@ def level_function(smiles_list):
             if rot <= 10 and tpsa <= 140:
                 veber_pass.append((smi, mol))
         stages.append({"stage": "Veber", "count": len(veber_pass)})
+
 
         params = FilterCatalog.FilterCatalogParams()
         params.AddCatalog(FilterCatalog.FilterCatalogParams.FilterCatalogs.PAINS)
@@ -43,6 +51,7 @@ def level_function(smiles_list):
             if catalog.GetFirstMatch(mol) is None:
                 pains_pass.append((smi, mol))
         stages.append({"stage": "PAINS", "count": len(pains_pass)})
+
 
         brenk_pass = []
         for smi, mol in pains_pass:
@@ -63,3 +72,11 @@ def level_function(smiles_list):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    library = ['c1ccc(NC(=O)C)cc1', 'CCCCCCCCCCCCCCCCCC', 'c1ccc([N+](=O)[O-])cc1', 'c1ccc(O)cc1', 'CC(C)Cc1ccc(C(C)C(=O)O)cc1', 'CCO', 'c1ccc(NC(=O)c2ccccc2)cc1', 'c1ccncc1']
+    result = level_function(library)
+    if result:
+        for s in result['cascade_results']:
+            print(f"Output: {s['stage']}{s['count']}")

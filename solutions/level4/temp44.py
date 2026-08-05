@@ -1,17 +1,21 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdMolDescriptors
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         num_aromatic_rings = rdMolDescriptors.CalcNumAromaticRings(mol_obj)
         has_aromatic_ring = num_aromatic_rings > 0
 
         if not has_aromatic_ring:
             return None
+
 
         rxn = AllChem.ReactionFromSmarts('[cH:1]>>[c:1]C')
         products = rxn.RunReactants((mol_obj,))
@@ -21,6 +25,7 @@ def level_function(mol):
         product = products[0][0]
         Chem.SanitizeMol(product)
         product_smiles = Chem.MolToSmiles(product)
+
 
         tpsa = rdMolDescriptors.CalcTPSA(product)
 
@@ -32,3 +37,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1O'
+    print(f'Output: {level_function(smiles)}')

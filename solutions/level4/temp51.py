@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, rdMolDescriptors
 
+
 def level_function(mol):
+
     try:
         from rdkit.Chem import Descriptors, BRICS, Crippen
 
@@ -12,9 +14,11 @@ def level_function(mol):
         mw = Descriptors.MolWt(mol_obj)
 
         if mw > 300:
+
             frags = BRICS.BRICSDecompose(mol_obj)
             if not frags:
                 return None
+
             best_frag = None
             best_size = 0
             for frag_smi in frags:
@@ -26,12 +30,14 @@ def level_function(mol):
                 return None
             final_mol = Chem.MolFromSmiles(best_frag)
         else:
+
             rxn = AllChem.ReactionFromSmarts('[cH:1]>>[c:1]c1ccccc1')
             products = rxn.RunReactants((mol_obj,))
             if products:
                 final_mol = products[0][0]
                 Chem.SanitizeMol(final_mol)
             else:
+
                 rxn2 = AllChem.ReactionFromSmarts('[CH:1]>>[C:1]c1ccccc1')
                 products = rxn2.RunReactants((mol_obj,))
                 if products:
@@ -52,3 +58,10 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'CC(C)Cc1ccc(C(C)C(=O)O)cc1'
+    print(f'Output: {level_function(smiles)}')
+    smiles2 = 'c1ccccc1'
+    print(f'Output: {level_function(smiles2)}')

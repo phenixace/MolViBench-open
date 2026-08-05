@@ -1,5 +1,7 @@
 from rdkit import Chem
 
+
+
 HERG_ALERTS = {
     "basic_nitrogen_piperidine": "C1CCNCC1",
     "basic_nitrogen_piperazine": "C1CNCCN1",
@@ -13,7 +15,9 @@ HERG_ALERTS = {
     "halogenated_aromatic": "c1cc([F,Cl])ccc1",
 }
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -35,3 +39,11 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(CCN(C)C)cc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['hERG_risk']}")
+        print(f"Output: {result['alerts']}")

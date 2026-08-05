@@ -1,7 +1,9 @@
 from rdkit import Chem
 import random
 
+
 def level_function():
+
     try:
         fragments = [
             "C", "CC", "CCC", "c1ccccc1", "C=O", "C(=O)O", "CCO", "CN",
@@ -18,3 +20,8 @@ def level_function():
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function()
+    print(f'Output: {result}')

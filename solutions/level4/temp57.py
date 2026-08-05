@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
+
 def level_function(target_mw_min=200, target_mw_max=250):
+
     try:
         start_mol = Chem.MolFromSmiles("c1ccccc1")
 
@@ -54,3 +56,10 @@ def level_function(target_mw_min=200, target_mw_max=250):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function(200, 250)
+    if result:
+        print(f"Output: {result['final_smiles']}{result['final_MW']}")
+        print(f"Output: {result['steps']}")

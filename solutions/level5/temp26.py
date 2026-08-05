@@ -2,7 +2,9 @@ from rdkit import Chem
 from rdkit.Chem import Descriptors
 import random
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -12,6 +14,7 @@ def level_function(mol):
         orig_smi = Chem.MolToSmiles(mol_obj)
 
         derivatives = []
+
 
         terminal_atoms = [
             atom.GetIdx() for atom in mol_obj.GetAtoms()
@@ -42,3 +45,9 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'CC(C)CC1=CC=C(C=C1)C(C)C(=O)O'
+    result = level_function(smiles)
+    print(f'Output: {result}')

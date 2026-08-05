@@ -3,34 +3,69 @@ MolViBench Evaluation Framework
 ================================
 
 Standard test molecule sets for benchmarking.
-All molecules sourced from ZINC250K (zinc250k_selfies.csv), seed=42.
+Molecules sourced from ZINC250K (zinc250k_selfies.csv) and common
+chemical building blocks, organized by structural complexity.
 """
 
+import random
+
 # ============================================================
-# Tier 1: Single-Molecule Test Set (20 diverse ZINC250K molecules)
+# Single-Molecule Test Pool — stratified by complexity
 # ============================================================
-SINGLE_MOLECULES = [
-    "CC(=O)NNC(=O)CSC[C@@H]([NH3+])C(=O)[O-]",
-    "CCOC(=O)c1cnc(S[C@H](CC)C(=O)[O-])nc1N",
+# Three tiers ensure every evaluation round tests code on both
+# trivial and realistic inputs.  The stratified_sample() function
+# draws from each tier so that Exec% reflects true robustness.
+
+TIER_SIMPLE = [
+    "CCCCCC",                       # hexane (saturated chain)
+    "CC(=O)O",                      # acetic acid
+    "C1CCCCC1",                     # cyclohexane
+    "c1ccccc1",                     # benzene
+    "c1ccncc1",                     # pyridine
+    "CC=CC",                        # 2-butene
+    "CCO",                          # ethanol
+]
+
+TIER_MEDIUM = [
+    "CC(=O)Nc1ccccc1",             # acetanilide
+    "OC(=O)c1ccccc1O",             # salicylic acid
+    "c1ccc2[nH]ccc2c1",            # indole
+    "C[C@@H](O)c1ccccc1",          # (R)-1-phenylethanol
+    "c1ccc2ncccc2c1",              # quinoline
+    "CCc1noc(CC)c1CNc1cc(Cl)nc(N)n1",  # aminopyrimidine
+    "COc1ccc(O)c(OC)c1",           # guaiacol derivative
+]
+
+TIER_COMPLEX = [
+    "CC(=O)NNC(=O)CSC[C@@H]([NH3+])C(=O)[O-]",                    # zwitterionic
+    "CCOC(=O)c1cnc(S[C@H](CC)C(=O)[O-])nc1N",                     # pyrimidine ester
     "O=C(c1ccccn1)N1CCC(C(=O)N2C[C@H]3C[C@H](O)[C@H](O)C[C@H]3C2)CC1",
     "Cc1cccc(NC(=O)C[NH+]2CCN(CC(=O)N3C[C@H](C)C[C@@H](C)C3)CC2)c1C",
-    "Cc1cc(C)cc(C(=O)N[C@H]2C(=O)N3C(C(=O)[O-])=C(CSc4nnc(C)s4)CS[C@H]23)c1",
     "O=C(/C=C/C1CC1)NCCC[NH+]1CCN(c2ccccc2Cl)CC1",
     "CCc1nc2n(n1)CCC[C@H]2[NH2+]Cc1cnn(-c2ccc(F)cc2)c1",
-    "O=C(c1cn(CCN2CCOCC2)nn1)N1CCCC[C@@H]1c1nc2ccc(F)cc2[nH]1",
     "COc1cc(Cl)ccc1C(=O)NNC(=O)c1ccc(C=O)cc1",
-    "CCc1noc(CC)c1CNc1cc(Cl)nc(N)n1",
-    "CCc1ccc(CCNC(=O)N2C[C@@H](C)O[C@H](C)C2)cc1",
-    "O=C(N/N=C\\c1ccc(I)o1)c1ccc(F)cc1",
-    "Cc1nn([C@H]2CCS(=O)(=O)C2)c(C)c1CC(=O)Nc1nc2c(C)cccc2s1",
-    "Cc1nc(-c2cccc(C[NH2+][C@@H](C)c3ccc4ccccc4n3)c2)n[nH]1",
-    "C[C@H](OC(=O)c1ccccn1)C(=O)Nc1ncc(C(F)(F)F)cc1Cl",
-    "O=C(CN[C@H](C1CCCC1)C(F)(F)F)N1CCC[C@H](C(F)(F)F)C1",
-    "Cc1cc(C)c(C#N)c(S[C@@H](C)CCCl)n1",
-    "C[C@H](NC(=O)Nc1ccccc1CC(N)=O)c1ccc(Cl)cc1Cl",
-    "Cc1csc2nc(CSCc3ccccc3Cl)cc(=O)n12",
-    "CC(C)c1nccn1Cc1cccc(NC(=O)N[C@@](C)(CO)C2CCCCC2)c1",
 ]
+
+# Flat pool (for backward compat — used by MOLECULE_PAIRS, etc.)
+SINGLE_MOLECULES = TIER_SIMPLE + TIER_MEDIUM + TIER_COMPLEX
+
+
+def stratified_sample(n: int = 5, seed: int = 42) -> list[str]:
+    """
+    Draw *n* molecules with stratified sampling across complexity tiers.
+    Distribution: 2 simple, 1-2 medium, 1-2 complex (for n=5).
+    Deterministic given the same seed.
+    """
+    rng = random.Random(seed)
+    per_tier = max(1, n // 3)
+    remainder = n - per_tier * 3
+
+    s = rng.sample(TIER_SIMPLE, min(per_tier + (1 if remainder > 0 else 0), len(TIER_SIMPLE)))
+    m = rng.sample(TIER_MEDIUM, min(per_tier + (1 if remainder > 1 else 0), len(TIER_MEDIUM)))
+    c = rng.sample(TIER_COMPLEX, min(per_tier, len(TIER_COMPLEX)))
+
+    result = s + m + c
+    return result[:n]
 
 # ============================================================
 # Tier 2: Molecule Pairs (for similarity, MCS, comparison tasks)

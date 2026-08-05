@@ -1,5 +1,7 @@
 from rdkit import Chem
 
+
+
 BBB_RULES = {
     "MW_lt_400": lambda mol: Chem.Descriptors.MolWt(mol) < 400,
     "LogP_1_to_3": lambda mol: 1.0 <= Chem.Crippen.MolLogP(mol) <= 3.0,
@@ -9,7 +11,9 @@ BBB_RULES = {
     "RotBonds_lt_8": lambda mol: Chem.rdMolDescriptors.CalcNumRotatableBonds(mol) < 8,
 }
 
+
 def level_function(mol):
+
     try:
         from rdkit.Chem import Descriptors, Crippen, rdMolDescriptors
 
@@ -49,3 +53,11 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(NC(=O)C)cc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['BBB_permeable']}")
+        print(f"Output: {result['rules_passed']}")

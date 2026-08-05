@@ -1,8 +1,12 @@
 from rdkit import Chem
 
+
+
 CYP_SMARTS = {
+    "azole": "[nR1]1[cR1][nR1][cR1][cR1]1",
     "thioamide": "[#6]C(=S)N",
     "hydroxamic_acid": "[OH]NC=O",
+    "methylenedioxy": "OCOc",
     "furan": "c1ccoc1",
     "thiophene": "c1ccsc1",
     "hydrazine": "NN",
@@ -12,7 +16,9 @@ CYP_SMARTS = {
     "primary_amine_aromatic": "c[NH2]",
 }
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -37,3 +43,11 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1cnc[nH]1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['predicted_CYP_inhibitor']}")
+        print(f"Output: {result['matched_patterns']}")

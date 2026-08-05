@@ -2,10 +2,12 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, rdMolDescriptors, RWMol
 
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         ring_info = mol_obj.GetRingInfo()
         has_ring = ring_info.NumRings() > 0
@@ -13,10 +15,12 @@ def level_function(mol):
         if not has_ring:
             return None
 
+
         rw_mol = Chem.RWMol(mol_obj)
         bond_rings = ring_info.BondRings()
         if not bond_rings:
             return None
+
 
         first_ring_bonds = bond_rings[0]
         bond_idx = first_ring_bonds[0]
@@ -32,6 +36,7 @@ def level_function(mol):
 
         product_smiles = Chem.MolToSmiles(rw_mol)
 
+
         product = Chem.MolFromSmiles(product_smiles)
         if product is None:
             mol_wt = rdMolDescriptors.CalcExactMolWt(rw_mol)
@@ -46,3 +51,7 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    smiles = 'C1CCCCC1'
+    print(f'Output: {level_function(smiles)}')

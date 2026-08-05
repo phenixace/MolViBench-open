@@ -1,11 +1,14 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         substituent_atoms = {
             'F': 9,
@@ -38,3 +41,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('c1ccccc1')
+    print(f'Output: {result}')

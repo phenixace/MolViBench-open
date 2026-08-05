@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import BRICS, Descriptors
 
+
 def level_function(smiles_list, max_products=200):
+
     try:
         mols = []
         for smi in smiles_list:
@@ -12,10 +14,12 @@ def level_function(smiles_list, max_products=200):
         if not mols:
             return None
 
+
         all_frags = set()
         for mol in mols:
             frags = BRICS.BRICSDecompose(mol)
             all_frags.update(frags)
+
 
         frag_mols = []
         for frag_smi in all_frags:
@@ -25,6 +29,7 @@ def level_function(smiles_list, max_products=200):
 
         if len(frag_mols) < 2:
             return None
+
 
         builder = BRICS.BRICSBuild(frag_mols, maxDepth=1)
         products = set()
@@ -42,6 +47,7 @@ def level_function(smiles_list, max_products=200):
                     break
             except Exception:
                 continue
+
 
         scored = []
         for smi in products:
@@ -67,3 +73,11 @@ def level_function(smiles_list, max_products=200):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    mols = ['c1ccc(NC(=O)C)cc1', 'c1ccc(OC)cc1', 'c1ccncc1CC(=O)O']
+    result = level_function(mols)
+    if result:
+        print(f"Output: {result['fragments']}{result['new_molecules']}")
+        print(f"Output: {result['avg_QED']}")

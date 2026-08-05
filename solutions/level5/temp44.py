@@ -1,18 +1,23 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
+
 def _synthetic_complexity_score(mol):
+
     num_rings = mol.GetRingInfo().NumRings()
     num_chiral = len(Chem.FindMolChiralCenters(mol, includeUnassigned=True))
     num_hetero = sum(1 for a in mol.GetAtoms() if a.GetAtomicNum() not in [1, 6])
     mw = Descriptors.MolWt(mol)
     return round(num_rings * 1.5 + num_chiral * 2.0 + num_hetero * 0.5 + mw / 200.0, 2)
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         halogen_rxns = [
             ('[cH:1]>>[c:1]F', 'F'),
@@ -33,6 +38,7 @@ def level_function(mol):
                     except Exception:
                         continue
 
+
         filtered = []
         for smi in derivatives:
             m = Chem.MolFromSmiles(smi)
@@ -41,6 +47,7 @@ def level_function(mol):
             mw = Descriptors.MolWt(m)
             if mw < 450:
                 filtered.append({'smiles': smi, 'mw': round(mw, 2), 'mol': m})
+
 
         results = []
         for item in filtered:
@@ -56,3 +63,11 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(CC(=O)O)cc1'
+    result = level_function(smiles)
+    if result:
+        for r in result[:5]:
+            print(f"Output: {r['smiles']}{r['mw']}{r['complexity_score']}")

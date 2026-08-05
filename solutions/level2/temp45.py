@@ -1,6 +1,8 @@
 from rdkit import Chem
 
+
 def level_function(mol1, mol2):
+
     try:
         m1 = Chem.MolFromSmiles(mol1)
         m2 = Chem.MolFromSmiles(mol2)
@@ -12,3 +14,10 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('CCO', 'OCC')
+    print(f'Output: {result}')
+    result2 = level_function('CCO', 'CCCO')
+    print(f'Output: {result2}')

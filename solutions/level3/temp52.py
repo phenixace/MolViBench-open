@@ -1,4 +1,5 @@
 from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors
 
 def level_function(reaction_smiles):
     try:
@@ -21,8 +22,8 @@ def level_function(reaction_smiles):
         r_bonds = sum(m.GetNumBonds() for m in reactants)
         p_bonds = sum(m.GetNumBonds() for m in products)
 
-        r_rings = sum(Chem.rdMolDescriptors.CalcNumRings(m) for m in reactants)
-        p_rings = sum(Chem.rdMolDescriptors.CalcNumRings(m) for m in products)
+        r_rings = sum(rdMolDescriptors.CalcNumRings(m) for m in reactants)
+        p_rings = sum(rdMolDescriptors.CalcNumRings(m) for m in products)
 
         halide_pattern = Chem.MolFromSmarts("[F,Cl,Br,I]")
         r_has_halide = any(m.HasSubstructMatch(halide_pattern) for m in reactants)
@@ -35,13 +36,13 @@ def level_function(reaction_smiles):
         if r_heavy == p_heavy and len(reactants) == 1 and len(products) == 1:
             return "Rearrangement"
         elif r_has_halide and not p_has_halide and len(products) >= len(reactants):
-            return "Nucleophilic Substitution"
+            return "Nucleophilic substitution"
         elif not r_has_db and p_has_db and p_bonds < r_bonds:
             return "Elimination"
         elif r_has_db and not p_has_db:
-            return "Electrophilic Addition"
+            return "Electrophilic addition"
         elif r_has_halide and not p_has_halide:
-            return "Nucleophilic Substitution"
+            return "Nucleophilic substitution"
         elif len(reactants) > len(products):
             return "Addition"
         elif len(reactants) < len(products):
@@ -51,3 +52,8 @@ def level_function(reaction_smiles):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    rxn = 'CCBr.O>>CCO.Br'
+    print(f'Output: {level_function(rxn)}')

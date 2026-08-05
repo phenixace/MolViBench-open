@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdMolDescriptors
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -12,11 +14,12 @@ def level_function(mol):
 
         if orig_tpsa < 100:
             return {"smiles": orig_smi, "tpsa": round(orig_tpsa, 2),
-                    "message": "TPSA already < 100"}
+                    "message": "TPSA < 100"}
+
 
         rxns = [
-            ('[OH:1]>>[OCH3:1]', 'Hydroxyl methylation'),
-            ('[NH2:1]>>[NHC:1]', 'Amino alkylation'),
+            ('[OH:1]>>[OCH3:1]', 'O-methylation'),
+            ('[NH2:1]>>[NHC:1]', 'N-alkylation'),
             ('[C:1](=O)[OH]>>[C:1](=O)OC', 'Esterification'),
         ]
 
@@ -46,3 +49,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'OC(=O)c1ccc(O)c(O)c1'
+    print(f'Output: {level_function(smiles)}')

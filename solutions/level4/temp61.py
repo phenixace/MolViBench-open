@@ -2,19 +2,25 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
+
 def level_function(mol1, mol2):
+
     try:
         m1 = Chem.MolFromSmiles(mol1)
         m2 = Chem.MolFromSmiles(mol2)
         if m1 is None or m2 is None:
             return None
 
+
         scaf1 = MurckoScaffold.GetScaffoldForMol(m1)
         scaf2 = MurckoScaffold.GetScaffoldForMol(m2)
         scaf1_smi = Chem.MolToSmiles(scaf1)
         scaf2_smi = Chem.MolToSmiles(scaf2)
 
+
+
         hybrid1_mols = AllChem.ReplaceSubstructs(m2, scaf2, scaf1)
+
         hybrid2_mols = AllChem.ReplaceSubstructs(m1, scaf1, scaf2)
 
         hybrid1_smi = None
@@ -33,6 +39,7 @@ def level_function(mol1, mol2):
                 hybrid2_smi = Chem.MolToSmiles(hybrid2_mols[0])
             except Exception:
                 pass
+
 
         fp1 = AllChem.GetMorganFingerprintAsBitVect(m1, 2, nBits=2048)
         fp2 = AllChem.GetMorganFingerprintAsBitVect(m2, 2, nBits=2048)
@@ -66,3 +73,12 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smi1 = 'c1ccc(NC(=O)C)cc1'
+    smi2 = 'c1ccnc(O)c1'
+    result = level_function(smi1, smi2)
+    if result:
+        print(f"Output: {result['scaffold1']}")
+        print(f"Output: {result['scaffold2']}")

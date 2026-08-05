@@ -1,25 +1,32 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, rdMolDescriptors
 
+
+
 PHARMACOPHORE_SMARTS = {
-    "H-bond donor": "[#7H,#8H]",
-    "H-bond acceptor": "[#7,#8]",
+    "Hydrogen-bond donor": "[#7H,#8H]",
+    "Hydrogen-bond acceptor": "[#7,#8]",
     "Aromatic ring": "a1aaaaa1",
     "Hydrophobic": "[CH2,CH3]",
 }
 
+
 def level_function(pharmacophore_type="Aromatic ring"):
+
     try:
+
         if pharmacophore_type not in PHARMACOPHORE_SMARTS:
             return None
 
         smarts = PHARMACOPHORE_SMARTS[pharmacophore_type]
+
 
         base_molecules = [
             "c1ccccc1", "c1ccncc1", "c1ccoc1", "c1ccsc1",
             "c1ccc(O)cc1", "c1ccc(N)cc1", "c1ccc(F)cc1",
             "c1ccc(C)cc1", "c1ccc(CC)cc1", "c1ccc2ccccc2c1",
         ]
+
 
         rxns = [
             '[cH:1]>>[c:1]C',
@@ -49,6 +56,7 @@ def level_function(pharmacophore_type="Aromatic ring"):
                         except Exception:
                             continue
 
+
         filtered = []
         for smi in candidates:
             mol = Chem.MolFromSmiles(smi)
@@ -63,8 +71,16 @@ def level_function(pharmacophore_type="Aromatic ring"):
                     'mw': round(mw, 2)
                 })
 
+
         filtered.sort(key=lambda x: x['mw'])
         return filtered[:3]
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('Aromatic ring')
+    if result:
+        for r in result:
+            print(f"Output: {r['smiles']}{r['mw']}{r['tpsa']}")

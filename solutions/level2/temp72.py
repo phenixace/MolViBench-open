@@ -1,6 +1,8 @@
 from rdkit import Chem
 
+
 def level_function(mol, smarts_pattern):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -15,3 +17,10 @@ def level_function(mol, smarts_pattern):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(O)c(O)c1'
+    smarts = '[OH]'
+    result = level_function(smiles, smarts)
+    print(f'Output: {result}')

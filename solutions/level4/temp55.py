@@ -2,7 +2,9 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 import random
 
+
 def level_function(mol, seed=42):
+
     try:
         random.seed(seed)
         mol_obj = Chem.MolFromSmiles(mol)
@@ -45,6 +47,7 @@ def level_function(mol, seed=42):
             if no_improve_count >= 2:
                 break
 
+
             best_next = None
             best_next_qed = current_qed
             random.shuffle(substituents)
@@ -78,3 +81,10 @@ def level_function(mol, seed=42):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['best_smiles']}{result['best_QED']}")

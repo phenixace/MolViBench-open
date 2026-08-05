@@ -2,11 +2,14 @@ import numpy as np
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem, Descriptors, Crippen
 
+
 def level_function(generated_smiles, reference_smiles):
+
     try:
         n_total = len(generated_smiles)
         if n_total == 0:
             return None
+
 
         valid_mols = []
         valid_smiles = []
@@ -19,8 +22,10 @@ def level_function(generated_smiles, reference_smiles):
 
         validity = len(valid_smiles) / n_total
 
+
         unique_smiles = set(valid_smiles)
         uniqueness = len(unique_smiles) / len(valid_smiles) if valid_smiles else 0.0
+
 
         ref_canonical = set()
         for smi in reference_smiles:
@@ -30,6 +35,7 @@ def level_function(generated_smiles, reference_smiles):
 
         novel_smiles = unique_smiles - ref_canonical
         novelty = len(novel_smiles) / len(unique_smiles) if unique_smiles else 0.0
+
 
         unique_list = list(unique_smiles)
         unique_mols = [Chem.MolFromSmiles(s) for s in unique_list]
@@ -43,6 +49,7 @@ def level_function(generated_smiles, reference_smiles):
             internal_diversity = float(np.mean(dists))
         else:
             internal_diversity = 0.0
+
 
         mw_vals, logp_vals, tpsa_vals, qed_vals = [], [], [], []
         for mol in unique_mols:
@@ -64,10 +71,12 @@ def level_function(generated_smiles, reference_smiles):
                 "median": round(float(np.median(arr)), 4),
             }
 
+
         ref_mols = [Chem.MolFromSmiles(s) for s in reference_smiles]
         ref_mols = [m for m in ref_mols if m is not None]
         ref_mw = [Descriptors.MolWt(m) for m in ref_mols]
         ref_logp = [Crippen.MolLogP(m) for m in ref_mols]
+
 
         def hist_overlap(vals1, vals2, bins=20):
             if not vals1 or not vals2:
@@ -110,3 +119,14 @@ def level_function(generated_smiles, reference_smiles):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    generated = ['c1ccccc1', 'c1ccc(O)cc1', 'c1ccc(N)cc1', 'invalid_smiles', 'c1ccc(F)cc1', 'c1ccc(Cl)cc1', 'c1ccccc1', 'CCO', 'CCCO', 'CC(=O)O']
+    reference = ['c1ccccc1', 'CCO', 'CC(C)O', 'c1ccncc1']
+    result = level_function(generated, reference)
+    if result:
+        print(f"Output: {result['metrics']['validity']}")
+        print(f"Output: {result['metrics']['uniqueness']}")
+        print(f"Output: {result['metrics']['novelty']}")
+        print(f"Output: {result['metrics']['internal_diversity']}")

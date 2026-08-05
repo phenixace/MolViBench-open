@@ -1,12 +1,16 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(aryl_halide, amine):
+
     try:
         mol1 = Chem.MolFromSmiles(aryl_halide)
         mol2 = Chem.MolFromSmiles(amine)
         if mol1 is None or mol2 is None:
             return None
+
+
 
         rxn_primary = AllChem.ReactionFromSmarts(
             "[c:1][Cl,Br,I].[NH2:2]>>[c:1][NH:2]"
@@ -14,6 +18,7 @@ def level_function(aryl_halide, amine):
         products = rxn_primary.RunReactants((mol1, mol2))
 
         if not products:
+
             rxn_secondary = AllChem.ReactionFromSmarts(
                 "[c:1][Cl,Br,I].[NH1:2]>>[c:1][N:2]"
             )
@@ -35,3 +40,10 @@ def level_function(aryl_halide, amine):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    aryl_x = 'c1ccc(Br)cc1'
+    amine_smi = 'CC(C)N'
+    result = level_function(aryl_x, amine_smi)
+    print(f'Output: {result}')

@@ -2,11 +2,15 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
 
+
 def level_function(fragments):
+
     try:
+
         params = FilterCatalogParams()
         params.AddCatalog(FilterCatalogParams.FilterCatalogs.PAINS)
         catalog = FilterCatalog(params)
+
 
         growth_rxns = [
             '[cH:1]>>[c:1]C',
@@ -34,6 +38,7 @@ def level_function(fragments):
                         except Exception:
                             continue
 
+
         filtered = []
         for smi in candidates:
             mol = Chem.MolFromSmiles(smi)
@@ -41,6 +46,7 @@ def level_function(fragments):
                 continue
             if catalog.GetFirstMatch(mol) is None:
                 filtered.append(smi)
+
 
         results = []
         for smi in filtered:
@@ -57,3 +63,11 @@ def level_function(fragments):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    frags = ['c1ccncc1', 'c1ccccc1', 'c1ccc2[nH]ccc2c1']
+    result = level_function(frags)
+    if result:
+        for r in result[:5]:
+            print(f"Output: {r['smiles']}{r['logp']}")

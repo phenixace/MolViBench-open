@@ -1,9 +1,11 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(mol):
+
     try:
-        reaction_smarts = '[C:1]([OH])[C:2]([H])>>[C:1]=[C:2]'
+        reaction_smarts = '[C:1](O)[C;H1,H2,H3:2]>>[C:1]=[C:2]'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
         molecule = Chem.MolFromSmiles(mol)
         if molecule is None:
@@ -22,3 +24,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'CCO'
+    print(f'Output: {level_function(smiles)}')

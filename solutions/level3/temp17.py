@@ -1,9 +1,11 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(mol1, mol2):
+
     try:
-        reaction_smarts = '[c:1][H].[C:2](=[O:3])[Cl]>>[c:1][C:2](=[O:3])'
+        reaction_smarts = '[c;H1:1].[C:2](=[O:3])[Cl] >> [c:1][C:2](=[O:3])'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
         aromatic = Chem.MolFromSmiles(mol1)
         acyl_halide = Chem.MolFromSmiles(mol2)
@@ -23,3 +25,9 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    aromatic = 'c1ccccc1'
+    acyl_halide = 'CC(=O)Cl'
+    print(f'Output: {level_function(aromatic, acyl_halide)}')

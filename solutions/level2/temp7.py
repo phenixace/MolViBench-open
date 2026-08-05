@@ -2,12 +2,17 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 def level_function(mol):
+
+
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
         rxn = AllChem.ReactionFromSmarts('[cH:1]>>[c:1]C')
         products = rxn.RunReactants((mol_obj,))
+
         unique_smiles = set()
         for product_tuple in products:
             for product in product_tuple:
@@ -18,3 +23,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1'
+    result = level_function(smiles)
+    print(f'Output: {result}')

@@ -2,8 +2,11 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, rdMolDescriptors
 import random
 
+
 def level_function(mols):
+
     try:
+
         active_mols = []
         active_fps = []
         for smi in mols:
@@ -16,12 +19,14 @@ def level_function(mols):
         if not active_mols:
             return []
 
+
         substituents = ['C', 'O', 'N', 'F', 'Cl', 'CC', 'OC', 'NC']
         candidates = set()
 
         for mol in active_mols:
             smi = Chem.MolToSmiles(mol)
             rw_mol = Chem.RWMol(mol)
+
 
             for atom_idx in range(mol.GetNumAtoms()):
                 atom = mol.GetAtomWithIdx(atom_idx)
@@ -41,6 +46,7 @@ def level_function(mols):
                         except Exception:
                             pass
 
+
             for atom_idx in range(mol.GetNumAtoms()):
                 atom = mol.GetAtomWithIdx(atom_idx)
                 orig_num = atom.GetAtomicNum()
@@ -59,6 +65,7 @@ def level_function(mols):
                         except Exception:
                             pass
 
+
         results = []
         for cand_smi in candidates:
             cand_mol = Chem.MolFromSmiles(cand_smi)
@@ -74,3 +81,9 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['c1ccccc1', 'CC(=O)Oc1ccccc1OC(C)=O', 'CC(C)CC1=CC=C(C=C1)C(C)C(=O)O']
+    result = level_function(smiles_list)
+    print(f'Output: {(result[:10] if result else result)}')

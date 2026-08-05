@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdChemReactions
 
+
 def level_function(mol, reaction_smarts):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -11,9 +13,11 @@ def level_function(mol, reaction_smarts):
         if rxn is None:
             return None
 
+
         products = rxn.RunReactants((mol_obj,))
         if not products:
             return None
+
 
         result = []
         for prod_set in products[:1]:
@@ -32,3 +36,9 @@ def level_function(mol, reaction_smarts):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1O'
+    rxn_smarts = '[OH:1]>>[Cl:1]'
+    print(f'Output: {level_function(smiles, rxn_smarts)}')

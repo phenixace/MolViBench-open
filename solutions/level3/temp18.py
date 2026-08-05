@@ -1,9 +1,11 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(mol1, mol2):
+
     try:
-        reaction_smarts = '[OH:1].[C:2][Br]>>[O:1][C:2]'
+        reaction_smarts = '[OH:1].[C:2][Cl,Br,I]>>[O:1][C:2]'
         rxn = AllChem.ReactionFromSmarts(reaction_smarts)
         alcohol = Chem.MolFromSmiles(mol1)
         halide = Chem.MolFromSmiles(mol2)
@@ -23,3 +25,9 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    alcohol = 'CCO'
+    halide = 'CCBr'
+    print(f'Output: {level_function(alcohol, halide)}')

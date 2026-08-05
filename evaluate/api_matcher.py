@@ -1,5 +1,5 @@
 """
-RDKitBench Evaluation Framework
+MolViBench Evaluation Framework
 ================================
 
 API-based fallback evaluator.

@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, Lipinski
 
+
 def level_function(mols):
+
     try:
         results = []
         for smi in mols:
@@ -18,3 +20,8 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['CCO', 'c1ccccc1', 'CC(=O)O', 'C' * 50, 'c1ccc(O)cc1']
+    print(f'Output: {level_function(smiles_list)}')

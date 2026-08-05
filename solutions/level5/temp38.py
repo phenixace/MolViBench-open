@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
+
 def level_function(mols):
+
     try:
         scaffolds = set()
         valid_count = 0
@@ -32,3 +34,9 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['c1ccccc1CC', 'c1ccc(CC)cc1', 'c1ccncc1', 'CCO', 'c1ccc2c(c1)cccc2']
+    result = level_function(smiles_list)
+    print(f'Output: {result}')

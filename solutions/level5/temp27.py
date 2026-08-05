@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -10,12 +12,13 @@ def level_function(mol):
         orig_mw = Descriptors.MolWt(mol_obj)
         orig_smi = Chem.MolToSmiles(mol_obj)
 
+
         growth_rxns = [
-            ('[cH:1]>>[c:1]C', 'Add methyl'),
-            ('[cH:1]>>[c:1]OC', 'Add methoxy'),
+            ('[cH:1]>>[c:1]C', 'Add methyl group'),
+            ('[cH:1]>>[c:1]OC', 'Add methoxy group'),
             ('[cH:1]>>[c:1]F', 'Add fluorine'),
             ('[cH:1]>>[c:1]Cl', 'Add chlorine'),
-            ('[cH:1]>>[c:1]CC', 'Add ethyl'),
+            ('[cH:1]>>[c:1]CC', 'Add ethyl group'),
             ('[NH2:1]>>[NH:1]C(=O)C', 'Acylation'),
         ]
 
@@ -47,3 +50,9 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(N)cc1'
+    result = level_function(smiles)
+    print(f'Output: {result}')

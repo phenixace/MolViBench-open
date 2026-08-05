@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
+
 def level_function(seed_smiles):
+
     try:
         seed = Chem.MolFromSmiles(seed_smiles)
         if seed is None:
@@ -34,12 +36,14 @@ def level_function(seed_smiles):
 
         rounds = []
 
+
         methyl_derivs = generate_derivatives(seed, '[cH:1]>>[c:1]C')
         if not methyl_derivs:
             methyl_derivs = generate_derivatives(seed, '[CH:1]>>[C:1](C)')
         best1_smi, best1_qed = best_by_qed(methyl_derivs)
         rounds.append({"round": 1, "type": "methyl", "num_derivs": len(methyl_derivs),
                        "best": best1_smi, "QED": round(best1_qed, 4) if best1_qed > 0 else None})
+
 
         if best1_smi:
             mol1 = Chem.MolFromSmiles(best1_smi)
@@ -53,6 +57,7 @@ def level_function(seed_smiles):
             best2_smi = best1_smi
             best2_qed = best1_qed
 
+
         if best2_smi:
             mol2 = Chem.MolFromSmiles(best2_smi)
             halogen_derivs = set()
@@ -65,6 +70,7 @@ def level_function(seed_smiles):
         else:
             best3_smi = best2_smi
             best3_qed = best2_qed
+
 
         all_candidates = {seed_smiles}
         if best1_smi: all_candidates.add(best1_smi)
@@ -81,3 +87,11 @@ def level_function(seed_smiles):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('c1ccccc1')
+    if result:
+        print(f"Output: {result['final_best']}{result['final_QED']}")
+        for r in result['rounds']:
+            print(f"Output: {r['round']}{r['type']}{r['num_derivs']}{r['QED']}")

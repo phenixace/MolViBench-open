@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -17,3 +19,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'CC(=O)Oc1ccccc1C(=O)O'
+    print(f'Output: {level_function(smiles)}')

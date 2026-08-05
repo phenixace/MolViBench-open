@@ -2,9 +2,12 @@ import numpy as np
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem, Descriptors, Crippen, rdMolDescriptors
 
-def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
+
+def level_function(seed_smiles, population_size=10, n_generations=5, seed=42):
+
     try:
         np.random.seed(seed)
+
 
         _sascorer = None
         try:
@@ -19,6 +22,7 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
             _sascorer = None
 
         def get_sa_score(mol):
+
             try:
                 if _sascorer is not None:
                     return _sascorer.calculateScore(mol)
@@ -27,15 +31,18 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 return 5.0
 
         def fitness(mol):
+
             try:
                 qed = Descriptors.qed(mol)
                 logp = Crippen.MolLogP(mol)
                 sa = get_sa_score(mol)
 
+
                 if 1.0 <= logp <= 3.0:
                     logp_score = 1.0
                 else:
                     logp_score = max(0, 1.0 - abs(logp - 2.0) / 5.0)
+
 
                 sa_score = max(0, 1.0 - (sa - 1.0) / 9.0)
 
@@ -44,6 +51,7 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 return 0.0
 
         def mutate(mol):
+
             try:
                 rwmol = Chem.RWMol(mol)
                 n_atoms = rwmol.GetNumAtoms()
@@ -53,6 +61,7 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 mutation_type = np.random.choice(['add_atom', 'remove_atom', 'change_bond', 'change_atom'])
 
                 if mutation_type == 'add_atom':
+                    atom_types = [6, 7, 8, 9, 17]
                     new_atom = Chem.Atom(atom_types[np.random.randint(len(atom_types))])
                     idx = rwmol.AddAtom(new_atom)
                     attach = np.random.randint(n_atoms)
@@ -83,6 +92,7 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 return mol
 
         def crossover(mol1, mol2):
+
             try:
                 combined = Chem.CombineMols(mol1, mol2)
                 rwmol = Chem.RWMol(combined)
@@ -96,6 +106,7 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 return rwmol.GetMol()
             except Exception:
                 return mol1
+
 
         seed_mol = Chem.MolFromSmiles(seed_smiles)
         if seed_mol is None:
@@ -111,6 +122,7 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
 
         history = []
         for gen in range(n_generations):
+
             scored = [(mol, fitness(mol)) for mol in population]
             scored.sort(key=lambda x: x[1], reverse=True)
 
@@ -124,14 +136,29 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 "mean_fitness": round(float(np.mean([s[1] for s in scored])), 4),
             })
 
-            survivors = [mol for mol, _ in scored[:population_size // 2]]
+
+            survivors = []
+            seen = set()
+            for mol, _ in scored:
+                smi = Chem.MolToSmiles(mol)
+                if smi not in seen:
+                    seen.add(smi)
+                    survivors.append(mol)
+                if len(survivors) >= population_size // 2:
+                    break
+
+            if not survivors:
+                survivors = [scored[0][0]]
+
 
             new_pop = list(survivors)
             while len(new_pop) < population_size:
                 if np.random.random() < 0.7:
+
                     parent = survivors[np.random.randint(len(survivors))]
                     child = mutate(parent)
                 else:
+
                     p1 = survivors[np.random.randint(len(survivors))]
                     p2 = survivors[np.random.randint(len(survivors))]
                     child = crossover(p1, p2)
@@ -142,12 +169,17 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
 
             population = new_pop[:population_size]
 
+
         final_scored = [(mol, fitness(mol)) for mol in population]
         final_scored.sort(key=lambda x: x[1], reverse=True)
 
         top_results = []
-        for mol, fit in final_scored[:10]:
+        seen_smiles = set()
+        for mol, fit in final_scored:
             smi = Chem.MolToSmiles(mol)
+            if smi in seen_smiles:
+                continue
+            seen_smiles.add(smi)
             top_results.append({
                 "smiles": smi,
                 "fitness": round(fit, 4),
@@ -155,6 +187,8 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
                 "LogP": round(Crippen.MolLogP(mol), 4),
                 "SA_score": round(get_sa_score(mol), 4),
             })
+            if len(top_results) >= 10:
+                break
 
         return {
             "seed": seed_smiles,
@@ -164,7 +198,16 @@ def level_function(seed_smiles, population_size=30, n_generations=20, seed=42):
             "final_fitness": round(history[-1]["best_fitness"], 4),
             "improvement": round(history[-1]["best_fitness"] - history[0]["best_fitness"], 4),
             "top_molecules": top_results,
+            "evolution_history": history[::5],
         }
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('c1ccc(NC(=O)C)cc1', population_size=30, n_generations=20)
+    if result:
+        print(f"Output: {result['initial_fitness']}{result['final_fitness']}")
+        for m in result['top_molecules'][:3]:
+            print(f"Output: {m['smiles']}{m['QED']}{m['LogP']}{m['SA_score']}")

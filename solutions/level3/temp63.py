@@ -1,30 +1,37 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdMolDescriptors
 
+
 def level_function(mol, num_confs=50):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
 
+
         ring_info = mol_obj.GetRingInfo()
         max_ring_size = max((len(r) for r in ring_info.AtomRings()), default=0)
 
         mol_h = Chem.AddHs(mol_obj)
+        if mol_h.GetNumHeavyAtoms() > 50:
+            return None
+
 
         params = AllChem.ETKDGv3()
         params.randomSeed = 42
         params.numThreads = 1
         params.useRandomCoords = True if max_ring_size >= 12 else False
 
-        cids = AllChem.EmbedMultipleConfs(mol_h, numConfs=num_confs, params=params)
+        cids = AllChem.EmbedMultipleConfs(mol_h, numConfs=num_confs, params=params, maxAttempts=5)
         if not cids:
             return None
+
 
         energies = []
         for cid in cids:
             try:
-                result = AllChem.MMFFOptimizeMolecule(mol_h, confId=cid, maxIters=500)
+                result = AllChem.MMFFOptimizeMolecule(mol_h, confId=cid, maxIters=100)
                 ff = AllChem.MMFFGetMoleculeForceField(mol_h, AllChem.MMFFGetMoleculeProperties(mol_h), confId=cid)
                 if ff:
                     energy = ff.CalcEnergy()
@@ -51,3 +58,11 @@ def level_function(mol, num_confs=50):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'C1CCCCCCCCCCC1'
+    result = level_function(smiles, num_confs=20)
+    if result:
+        print(f"Output: {result['is_macrocycle']}{result['max_ring_size']}")
+        print(f"Output: {result['energy_range']}")

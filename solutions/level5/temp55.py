@@ -5,11 +5,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
+
 def level_function(smiles_list, labels, new_smiles_list=None, fp_radius=2, fp_bits=2048, seed=42):
+
     try:
         mols = [Chem.MolFromSmiles(s) for s in smiles_list]
         if any(m is None for m in mols):
             return None
+
 
         X = np.array([
             list(AllChem.GetMorganFingerprintAsBitVect(m, fp_radius, nBits=fp_bits))
@@ -17,11 +20,14 @@ def level_function(smiles_list, labels, new_smiles_list=None, fp_radius=2, fp_bi
         ], dtype=int)
         y = np.array(labels, dtype=int)
 
+
         clf = RandomForestClassifier(n_estimators=100, random_state=seed)
+
 
         n_cv = min(5, len(y))
         cv_acc = cross_val_score(clf, X, y, cv=n_cv, scoring='accuracy')
         cv_f1 = cross_val_score(clf, X, y, cv=n_cv, scoring='f1_macro')
+
 
         clf.fit(X, y)
         train_pred = clf.predict(X)
@@ -43,6 +49,7 @@ def level_function(smiles_list, labels, new_smiles_list=None, fp_radius=2, fp_bi
             "train_recall": round(train_rec, 4),
             "train_f1": round(train_f1, 4),
         }
+
 
         if new_smiles_list:
             new_mols = [Chem.MolFromSmiles(s) for s in new_smiles_list]
@@ -68,3 +75,12 @@ def level_function(smiles_list, labels, new_smiles_list=None, fp_radius=2, fp_bi
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = ['c1ccccc1', 'c1ccc(O)cc1', 'c1ccc(N)cc1', 'c1ccc(F)cc1', 'c1ccc(Cl)cc1', 'c1ccc(Br)cc1', 'c1ccc(C)cc1', 'c1ccc(OC)cc1', 'c1ccc(C(=O)O)cc1', 'c1ccc(C#N)cc1']
+    labels = [0, 1, 1, 0, 1, 1, 0, 0, 1, 1]
+    result = level_function(smiles, labels, new_smiles_list=['c1ccc(CC)cc1'])
+    if result:
+        print(f"Output: {result['cv_accuracy_mean']}{result['cv_accuracy_std']}")
+        print(f"Output: {result['cv_f1_mean']}{result['cv_f1_std']}")

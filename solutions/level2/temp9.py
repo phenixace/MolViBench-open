@@ -2,10 +2,15 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 
 def level_function(mol, substituent="C"):
+
+
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
+
         rxn_smarts = f'[cH:1]1[cH:2][cH:3][cH:4][cH:5][cH:6]1>>[c:1]({substituent})1[cH:2][cH:3][c:4]({substituent})[cH:5][cH:6]1'
         rxn = AllChem.ReactionFromSmarts(rxn_smarts)
         products = rxn.RunReactants((mol_obj,))
@@ -21,3 +26,8 @@ def level_function(mol, substituent="C"):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1'
+    result = level_function(smiles, 'C')
+    print(f'Output: {result}')

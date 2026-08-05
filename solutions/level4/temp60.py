@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(mol, reaction_smarts_list):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -52,3 +54,11 @@ def level_function(mol, reaction_smarts_list):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(O)cc1'
+    rxns = ['[OH:1]>>[Cl:1]', '[NH2:1]>>[N:1]C(=O)C', '[cH:1]>>[c:1]C']
+    result = level_function(smiles, rxns)
+    if result:
+        print(f"Output: {result['successful_reactions']}{result['skipped_reactions']}")

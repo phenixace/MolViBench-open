@@ -1,7 +1,9 @@
 from rdkit import Chem
 import random
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -15,6 +17,7 @@ def level_function(mol):
         bond = random.choice(bonds)
         bond_idx = bond.GetIdx()
         current_type = bond.GetBondType()
+
 
         bond_types = [Chem.BondType.SINGLE, Chem.BondType.DOUBLE, Chem.BondType.TRIPLE]
         candidates = [bt for bt in bond_types if bt != current_type]
@@ -32,3 +35,9 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'CCCC'
+    for _ in range(5):
+        print(f'Output: {level_function(smiles)}')

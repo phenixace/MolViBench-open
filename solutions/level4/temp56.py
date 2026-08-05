@@ -2,7 +2,9 @@ from rdkit import Chem
 from rdkit.Chem import Descriptors, Crippen, rdMolDescriptors
 import random
 
+
 def level_function(mol, seed=42):
+
     try:
         random.seed(seed)
         mol_obj = Chem.MolFromSmiles(mol)
@@ -10,6 +12,7 @@ def level_function(mol, seed=42):
             return None
 
         def lipinski_score(m):
+
             mw = Descriptors.MolWt(m)
             logp = Crippen.MolLogP(m)
             hbd = rdMolDescriptors.CalcNumHBD(m)
@@ -27,14 +30,18 @@ def level_function(mol, seed=42):
         history = [{"round": 0, "smiles": Chem.MolToSmiles(current_mol),
                     "violations": current_violations, **current_props}]
 
+        replacement_atoms = [6, 7, 8, 9]
+
         for round_num in range(1, 11):
             rw = Chem.RWMol(current_mol)
             num_atoms = rw.GetNumAtoms()
             if num_atoms == 0:
                 break
 
+
             atom_idx = random.randint(0, num_atoms - 1)
             original_num = rw.GetAtomWithIdx(atom_idx).GetAtomicNum()
+
 
             candidates = [a for a in replacement_atoms if a != original_num]
             random.shuffle(candidates)
@@ -71,3 +78,10 @@ def level_function(mol, seed=42):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(CCCCCCC)cc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['final_smiles']}{result['final_violations']}")

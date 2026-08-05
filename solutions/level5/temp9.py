@@ -1,16 +1,20 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
 
         original_smi = Chem.MolToSmiles(mol_obj)
+        halogens = [9, 17, 35, 53]
         halogen_names = {9: 'F', 17: 'Cl', 35: 'Br', 53: 'I'}
 
         derivatives = set()
+
 
         for atom_idx in range(mol_obj.GetNumAtoms()):
             atom = mol_obj.GetAtomWithIdx(atom_idx)
@@ -31,3 +35,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('c1ccccc1')
+    print(f'Output: {result}')

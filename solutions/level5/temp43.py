@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -13,9 +15,11 @@ def level_function(mol):
         if not atom_rings:
             return None
 
+
         isomers = set()
         isomers.add(Chem.MolToSmiles(mol_obj))
 
+        replacements = [6, 7, 8, 16]
         for ring in atom_rings:
             for idx in ring:
                 orig_num = mol_obj.GetAtomWithIdx(idx).GetAtomicNum()
@@ -31,6 +35,7 @@ def level_function(mol):
                     except Exception:
                         continue
 
+
         best = None
         for smi in isomers:
             m = Chem.MolFromSmiles(smi)
@@ -43,6 +48,7 @@ def level_function(mol):
         if best is None:
             return None
 
+
         best_mol = Chem.MolFromSmiles(best['smiles'])
         best['qed'] = round(Descriptors.qed(best_mol), 4)
 
@@ -53,3 +59,9 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccncc1'
+    result = level_function(smiles)
+    print(f'Output: {result}')

@@ -1,13 +1,15 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
+
 TARGET_FEATURES = {
     "Kinase inhibitor": ["c1ccncc1", "c1ccc2[nH]ccc2c1", "[NH]C(=O)"],
     "GPCR ligand": ["c1ccc2c(c1)CCNC2", "[NH]c1ccccc1", "c1ccncc1"],
     "Protease inhibitor": ["C(=O)N", "[OH]C(=O)", "NC(=O)C"],
     "Nuclear receptor ligand": ["C1CCC2C(C1)CCC1C2CCC2(C)C1CCC2O", "c1ccc(O)cc1"],
-    "Ion channel modulator": ["c1ccccc1N", "[NH2]CCCC", "C(=O)N"],
+    "Ion-channel modulator": ["c1ccccc1N", "[NH2]CCCC", "C(=O)N"],
 }
+
 
 def level_function(mol):
     try:
@@ -36,3 +38,11 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc2c(c1)cc(CC(=O)O)[nH]2'
+    result = level_function(smiles)
+    if result:
+        for p in result:
+            print(f"Output: {p['target']}{p['confidence']}")

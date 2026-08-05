@@ -1,7 +1,14 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(core_smiles, rgroup_lists):
+
+
+
+
+
+
     try:
         from itertools import product
 
@@ -9,14 +16,17 @@ def level_function(core_smiles, rgroup_lists):
         if core is None:
             return None
 
+
         dummy_info = {}
         for atom in core.GetAtoms():
+            if atom.GetAtomicNum() == 0:
                 map_num = atom.GetAtomMapNum()
                 if map_num > 0:
                     dummy_info[map_num] = atom.GetIdx()
 
         if not dummy_info:
             return None
+
 
         rgroup_keys = sorted(rgroup_lists.keys())
         rgroup_values = [rgroup_lists[k] for k in rgroup_keys]
@@ -25,18 +35,22 @@ def level_function(core_smiles, rgroup_lists):
         for combo in product(*rgroup_values):
             try:
                 combined = Chem.RWMol(core)
+
                 for rg_idx, rg_smi in zip(rgroup_keys, combo):
                     rg_mol = Chem.MolFromSmiles(rg_smi)
                     if rg_mol is None:
                         continue
 
+
                     rxn_smarts = f"[*:{rg_idx}][*:99].[*:99]{rg_smi}>>[*:{rg_idx}]{rg_smi}"
+
 
                 mol = Chem.RWMol(core)
                 for rg_idx, rg_smi in zip(rgroup_keys, combo):
                     rg_mol = Chem.MolFromSmiles(rg_smi)
                     if rg_mol is None:
                         continue
+
                     dummy_pattern = Chem.MolFromSmarts(f"[#0:{rg_idx}]")
                     replaced = AllChem.ReplaceSubstructs(mol, dummy_pattern, rg_mol,
                                                          replaceAll=True)
@@ -57,3 +71,13 @@ def level_function(core_smiles, rgroup_lists):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    core = '[*:1]c1ccc([*:2])cc1'
+    rgroups = {1: ['C', 'CC', 'O'], 2: ['F', 'Cl', 'N']}
+    result = level_function(core, rgroups)
+    print(f'Output: {(len(result) if result else 0)}')
+    if result:
+        for smi in result[:5]:
+            print(f'Output: {smi}')

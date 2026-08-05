@@ -3,6 +3,7 @@ from rdkit.Chem import Descriptors, AllChem
 import pandas as pd
 import io
 
+
 def level_function(sdf_content):
     try:
         supplier = Chem.SDMolSupplier()
@@ -32,3 +33,14 @@ def level_function(sdf_content):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == "__main__":
+    mols = [Chem.MolFromSmiles(s) for s in ["CCO", "c1ccccc1", "CC(=O)O"]]
+    sdf_str = ""
+    for m in mols:
+        if m:
+            AllChem.Compute2DCoords(m)
+            sdf_str += Chem.MolToMolBlock(m) + "$$$$\n"
+    result = level_function(sdf_str)
+    print(f"Output: {result}")

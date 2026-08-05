@@ -1,6 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 
+
 def level_function(mols):
     try:
         mol_data = []
@@ -14,6 +15,7 @@ def level_function(mols):
         if len(mol_data) <= 10:
             return [d['smiles'] for d in mol_data]
 
+        selected = [0]
         remaining = list(range(1, len(mol_data)))
 
         while len(selected) < 10 and remaining:
@@ -35,3 +37,11 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == "__main__":
+    smiles_list = ["CCO", "CCCO", "c1ccccc1", "c1ccc(C)cc1", "c1ccncc1",
+                   "CC(=O)O", "CCC(=O)O", "CCCC", "c1ccc(O)cc1", "CCN",
+                   "c1ccc(F)cc1", "c1ccc(Cl)cc1"]
+    result = level_function(smiles_list)
+    print(f"Output: {result}")

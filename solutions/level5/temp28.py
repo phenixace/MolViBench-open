@@ -2,7 +2,9 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 from rdkit.Chem import rdMolDescriptors
 
+
 def _synthetic_complexity_score(mol):
+
     num_rings = mol.GetRingInfo().NumRings()
     num_chiral = len(Chem.FindMolChiralCenters(mol, includeUnassigned=True))
     num_hetero = sum(1 for a in mol.GetAtoms() if a.GetAtomicNum() not in [1, 6])
@@ -10,7 +12,9 @@ def _synthetic_complexity_score(mol):
     score = num_rings * 1.5 + num_chiral * 2.0 + num_hetero * 0.5 + mw / 200.0
     return round(score, 2)
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -20,6 +24,7 @@ def level_function(mol):
         orig_smi = Chem.MolToSmiles(mol_obj)
 
         derivatives = []
+
 
         for idx in range(mol_obj.GetNumAtoms()):
             atom = mol_obj.GetAtomWithIdx(idx)
@@ -41,6 +46,7 @@ def level_function(mol):
                                 })
                 except Exception:
                     continue
+
 
         for idx in range(mol_obj.GetNumAtoms()):
             atom = mol_obj.GetAtomWithIdx(idx)
@@ -68,3 +74,9 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'CC(C)CC1=CC=C(C=C1)C(C)C(=O)O'
+    result = level_function(smiles)
+    print(f'Output: {result}')

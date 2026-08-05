@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, Crippen, rdMolDescriptors
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -14,10 +16,13 @@ def level_function(mol):
         num_atoms = mol_obj.GetNumAtoms()
         mr = Crippen.MolMR(mol_obj)
 
+
         veber = rot_bonds <= 10 and tpsa <= 140
+
 
         ghose = (160 <= mw <= 480 and -0.4 <= logp <= 5.6 and
                  40 <= num_atoms <= 480 and 20 <= mr <= 130)
+
 
         egan = tpsa <= 131.6 and logp <= 5.88
 
@@ -38,3 +43,11 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccc(NC(=O)c2ccc(F)cc2)cc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['Veber']}{result['Ghose']}{result['Egan']}")
+        print(f"Output: {result['passes_all']}")

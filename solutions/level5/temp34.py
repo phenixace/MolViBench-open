@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
+
 def level_function(mols):
+
     try:
         mol_data = []
         for smi in mols:
@@ -14,7 +16,9 @@ def level_function(mols):
                 'smiles': Chem.MolToSmiles(mol),
                 'logp': round(logp, 2),
                 'tpsa': round(tpsa, 2),
+                'logp_dist': round(abs(logp - 2), 2)
             })
+
 
         pareto_front = []
         for i, d in enumerate(mol_data):
@@ -34,3 +38,11 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['CCO', 'c1ccccc1', 'CC(=O)O', 'c1ccc(O)cc1', 'CC(C)CC1=CC=C(C=C1)C(C)C(=O)O', 'c1ccncc1']
+    result = level_function(smiles_list)
+    if result:
+        for r in result:
+            print(f"Output: {r['smiles']}{r['logp']}{r['tpsa']}")

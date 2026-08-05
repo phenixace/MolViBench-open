@@ -1,13 +1,17 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, Crippen, rdMolDescriptors, FilterCatalog
 
+
+
 BRENK_SMARTS = {
     "aldehyde": "[CH1](=O)", "epoxide": "C1OC1",
     "peroxide": "OO", "azide": "N=[N+]=[N-]",
     "disulfide": "SS", "nitro": "[N+](=O)[O-]",
 }
 
+
 def level_function(smiles_list):
+
     try:
         categories = {"safe": [], "risky": [], "reject": []}
 
@@ -24,10 +28,13 @@ def level_function(smiles_list):
             num_atoms = mol.GetNumAtoms()
             mr = Crippen.MolMR(mol)
 
+
             veber = rot_bonds <= 10 and tpsa <= 140
+
 
             ghose = (160 <= mw <= 480 and -0.4 <= logp <= 5.6 and
                      40 <= num_atoms <= 480 and 20 <= mr <= 130)
+
 
             brenk_pass = True
             for name, smarts in BRENK_SMARTS.items():
@@ -57,3 +64,10 @@ def level_function(smiles_list):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    mols = ['c1ccc(NC(=O)c2ccccc2)cc1', 'CCO', 'c1ccc([N+](=O)[O-])cc1', 'CC(C)Cc1ccc(C(C)C(=O)O)cc1', 'CCCCCCCCCCCCCCCCCCCC']
+    result = level_function(mols)
+    if result:
+        print(f"Output: {result['safe_count']}{result['risky_count']}{result['reject_count']}")

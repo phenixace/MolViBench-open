@@ -2,10 +2,12 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, rdMolDescriptors, RWMol
 
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         heteroatom_idx = None
         for atom in mol_obj.GetAtoms():
@@ -18,12 +20,14 @@ def level_function(mol):
         if not has_heteroatom:
             return None
 
+
         rw_mol = RWMol(mol_obj)
         rw_mol.GetAtomWithIdx(heteroatom_idx).SetAtomicNum(8)
 
         product = rw_mol.GetMol()
         Chem.SanitizeMol(product)
         product_smiles = Chem.MolToSmiles(product)
+
 
         tpsa = rdMolDescriptors.CalcTPSA(product)
 
@@ -35,3 +39,7 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    smiles = 'CCN'
+    print(f'Output: {level_function(smiles)}')

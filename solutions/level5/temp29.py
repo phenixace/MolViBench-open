@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -16,6 +18,7 @@ def level_function(mol):
         if not atom_rings:
             return None
 
+
         heterocyclic_atoms = set()
         for ring in atom_rings:
             for idx in ring:
@@ -26,7 +29,9 @@ def level_function(mol):
         if not heterocyclic_atoms:
             return None
 
-        replacements = [(6, 'C'), (7, 'N'), (8, 'O'), (16, 'S')]
+
+
+        replacements = [6, 7, 8, 16]
         results = []
 
         for idx in heterocyclic_atoms:
@@ -34,12 +39,19 @@ def level_function(mol):
             orig_num = atom.GetAtomicNum()
             if orig_num == 6:
                 continue
-            for new_num, sym in replacements:
+            for new_num in replacements:
                 if new_num == orig_num:
                     continue
                 try:
                     rw = Chem.RWMol(mol_obj)
-                    rw.GetAtomWithIdx(idx).SetAtomicNum(new_num)
+
+                    Chem.Kekulize(rw, clearAromaticFlags=True)
+                    target_atom = rw.GetAtomWithIdx(idx)
+                    target_atom.SetAtomicNum(new_num)
+
+                    target_atom.SetNoImplicit(False)
+                    target_atom.SetNumExplicitHs(0)
+
                     Chem.SanitizeMol(rw)
                     smi = Chem.MolToSmiles(rw)
                     if smi != orig_smi and smi not in [r['smiles'] for r in results]:
@@ -58,3 +70,9 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccncc1CC(=O)O'
+    result = level_function(smiles)
+    print(f'Output: {result}')

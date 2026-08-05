@@ -2,7 +2,9 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 from rdkit.Chem.Pharm2D import Gobbi_Pharm2D, Generate
 
+
 def level_function(mol1, mol2):
+
     try:
         m1 = Chem.MolFromSmiles(mol1)
         m2 = Chem.MolFromSmiles(mol2)
@@ -16,6 +18,7 @@ def level_function(mol1, mol2):
         fp1 = Generate.Gen2DFingerprint(m1, factory)
         fp2 = Generate.Gen2DFingerprint(m2, factory)
 
+
         tanimoto = DataStructs.TanimotoSimilarity(fp1, fp2)
         dice = DataStructs.DiceSimilarity(fp1, fp2)
 
@@ -28,3 +31,12 @@ def level_function(mol1, mol2):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smi1 = 'c1ccc(NC(=O)C)cc1'
+    smi2 = 'c1ccc(NC(=O)CC)cc1'
+    result = level_function(smi1, smi2)
+    if result:
+        print(f"Output: {result['tanimoto']}")
+        print(f"Output: {result['dice']}")

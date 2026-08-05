@@ -1,11 +1,14 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdMolDescriptors
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         pattern = Chem.MolFromSmarts('[C:1](=O)[O:2][C:3]')
         has_ester = mol_obj.HasSubstructMatch(pattern)
@@ -13,12 +16,14 @@ def level_function(mol):
         if not has_ester:
             return None
 
+
         rxn = AllChem.ReactionFromSmarts(
             '[C:1](=O)[O:2][C:3]>>[C:1](=O)O.[C:3]O'
         )
         products = rxn.RunReactants((mol_obj,))
         if not products:
             return None
+
 
         fragments = []
         for product in products[0]:
@@ -37,3 +42,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'CC(=O)OCC'
+    print(f'Output: {level_function(smiles)}')

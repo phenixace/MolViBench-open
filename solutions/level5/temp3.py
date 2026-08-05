@@ -1,18 +1,28 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+
 def level_function(mol):
+
     try:
         scaffold = Chem.MolFromSmiles(mol)
         if scaffold is None:
             return None
 
+
         side_chains = {
+            'methyl': 6,
+            'ethyl': None,
             'propyl': None,
+            'hydroxyl': 8,
+            'amino': 7,
+            'fluoro': 9,
+            'chloro': 17,
             'methoxy': None,
             'carboxyl': None,
             'cyano': None,
         }
+
 
         simple_atoms = {
             'methyl': ('C', 6),
@@ -21,6 +31,7 @@ def level_function(mol):
             'fluoro': ('F', 9),
             'chloro': ('Cl', 17),
         }
+
 
         complex_groups = {
             'ethyl': '[cH1:1]>>[c:1]CC',
@@ -33,12 +44,14 @@ def level_function(mol):
         original_smi = Chem.MolToSmiles(scaffold)
         derivatives = []
 
+
         target_idx = None
         for atom_idx in range(scaffold.GetNumAtoms()):
             atom = scaffold.GetAtomWithIdx(atom_idx)
             if atom.GetNumImplicitHs() > 0:
                 target_idx = atom_idx
                 break
+
 
         if target_idx is not None:
             for name, (symbol, atomic_num) in simple_atoms.items():
@@ -53,6 +66,7 @@ def level_function(mol):
                 except Exception:
                     pass
 
+
         for name, rxn_smarts in complex_groups.items():
             try:
                 rxn = AllChem.ReactionFromSmarts(rxn_smarts)
@@ -65,6 +79,7 @@ def level_function(mol):
                         derivatives.append((name, new_smi))
             except Exception:
                 pass
+
 
         if len(derivatives) < 10:
             for atom_idx in range(scaffold.GetNumAtoms()):
@@ -87,3 +102,8 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('c1ccccc1')
+    print(f'Output: {result}')

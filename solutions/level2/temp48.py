@@ -2,7 +2,9 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 import numpy as np
 
-def level_function(mols, perplexity=5, n_iter=500, lr=100.0):
+
+def level_function(mols, perplexity=5, n_iter=50, lr=100.0):
+
     try:
         fps = []
         valid_smiles = []
@@ -19,6 +21,8 @@ def level_function(mols, perplexity=5, n_iter=500, lr=100.0):
         X = np.array(fps, dtype=float)
         n = X.shape[0]
         perplexity = min(perplexity, n - 1)
+
+
 
         def _pairwise_sq_dist(M):
             sum_sq = np.sum(M ** 2, axis=1)
@@ -45,6 +49,7 @@ def level_function(mols, perplexity=5, n_iter=500, lr=100.0):
         P = (P + P.T) / (2 * n)
         P = np.maximum(P, 1e-12)
 
+
         Y = np.random.randn(n, 2) * 0.01
         for it in range(n_iter):
             d_low = _pairwise_sq_dist(Y)
@@ -66,3 +71,9 @@ def level_function(mols, perplexity=5, n_iter=500, lr=100.0):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['CCO', 'c1ccccc1', 'CC(=O)O', 'CCCC', 'c1ccc(O)cc1', 'CC(C)O', 'c1ccncc1', 'CCN']
+    result = level_function(smiles_list)
+    print(f'Output: {result}')

@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, rdFMCS
 
+
 def level_function(smiles_list):
+
     try:
         mols = []
         fps = []
@@ -15,6 +17,7 @@ def level_function(smiles_list):
 
         if len(mols) < 2:
             return None
+
 
         n = len(mols)
         best_sim = -1
@@ -34,6 +37,7 @@ def level_function(smiles_list):
                 else:
                     row.append(sim_matrix[j][i])
             sim_matrix.append(row)
+
 
         i, j = best_pair
         mcs_result = rdFMCS.FindMCS([mols[i], mols[j]], timeout=10)
@@ -55,3 +59,12 @@ def level_function(smiles_list):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    mols = ['c1ccccc1O', 'c1ccccc1N', 'CCCCCC', 'c1ccncc1', 'c1ccc(O)c(O)c1']
+    result = level_function(mols)
+    if result:
+        p = result['most_similar_pair']
+        print(f"Output: {p['mol1']}{p['mol2']}{p['similarity']}")
+        print(f"Output: {result['MCS']['smarts']}")

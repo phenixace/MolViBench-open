@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 
+
 def level_function(mols):
+
     try:
         fps = []
         valid_smiles = []
@@ -30,3 +32,12 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['CCO', 'c1ccccc1', 'CC(=O)O', 'CCCC']
+    result = level_function(smiles_list)
+    if result:
+        print('Output:', result['smiles'])
+        for row in result['similarity_matrix']:
+            print('Output:', [f'{x:.4f}' for x in row])

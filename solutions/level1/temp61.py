@@ -1,6 +1,8 @@
 from rdkit import Chem
 
+
 def level_function(mol):
+
     try:
         if not isinstance(mol, str) or len(mol.strip()) == 0:
             return {"valid": False, "error": "Empty or non-string input"}
@@ -14,3 +16,8 @@ def level_function(mol):
         return {"valid": True, "canonical_smiles": Chem.MolToSmiles(mol_obj)}
     except Exception as e:
         return {"valid": False, "error": str(e)}
+
+
+if __name__ == '__main__':
+    for smi in ['CCO', 'C(C)(C)(C)(C)(C)', 'invalid', '']:
+        print(f'Output: {smi!r}{level_function(smi)}')

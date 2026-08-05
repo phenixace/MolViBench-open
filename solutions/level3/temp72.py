@@ -1,11 +1,14 @@
 from rdkit import Chem
 
+
 def level_function(generated_smiles, reference_smiles=None):
+
     try:
         if not generated_smiles:
             return None
 
         total = len(generated_smiles)
+
 
         valid_mols = []
         valid_smiles_set = set()
@@ -18,7 +21,9 @@ def level_function(generated_smiles, reference_smiles=None):
 
         validity = len(valid_mols) / total if total > 0 else 0.0
 
+
         uniqueness = len(valid_smiles_set) / len(valid_mols) if valid_mols else 0.0
+
 
         novelty = 1.0
         if reference_smiles:
@@ -42,3 +47,13 @@ def level_function(generated_smiles, reference_smiles=None):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    generated = ['CCO', 'c1ccccc1', 'CCO', 'INVALID_SMILES', 'CC(=O)O', 'c1ccccc1', 'CCN', 'CCC', 'bad_mol', 'CCCC']
+    reference = ['CCO', 'c1ccccc1', 'CC(=O)O']
+    result = level_function(generated, reference)
+    if result:
+        print(f"Output: {result['validity']}")
+        print(f"Output: {result['uniqueness']}")
+        print(f"Output: {result['novelty']}")

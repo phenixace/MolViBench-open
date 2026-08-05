@@ -1,34 +1,34 @@
 from rdkit import Chem
-from rdkit.Chem import AllChem, rdMolDescriptors, RWMol
+from rdkit.Chem import AllChem, rdMolDescriptors
 
-def level_function(mol):
+def level_function(mol_smi):
+     pass
     try:
-        mol_obj = Chem.MolFromSmiles(mol)
-        if mol_obj is None:
+        mol = Chem.MolFromSmiles(mol_smi)
+        if mol is None: return None
+
+        halogen_pattern = Chem.MolFromSmarts('[F,Cl,Br,I]')
+        if not mol.HasSubstructMatch(halogen_pattern):
             return None
 
-        pattern = Chem.MolFromSmarts('[F,Cl,Br,I]')
-        has_halogen = mol_obj.HasSubstructMatch(pattern)
+        product = Chem.DeleteSubstructs(mol, halogen_pattern)
 
-        if not has_halogen:
-            return None
-
-        rxn = AllChem.ReactionFromSmarts('[C:1][F,Cl,Br,I]>>[C:1][H]')
-        products = rxn.RunReactants((mol_obj,))
-        if not products:
-            return None
-
-        product = products[0][0]
         Chem.SanitizeMol(product)
         product_smiles = Chem.MolToSmiles(product)
 
         logp = rdMolDescriptors.CalcCrippenDescriptors(product)[0]
 
         return {
-            "has_halogen": has_halogen,
+            "has_halogen": True,
+            "original_smiles": mol_smi,
             "product": product_smiles,
             "logp": round(logp, 4)
         }
     except Exception as e:
-        print(e)
+        print(f"Error: {e}")
         return None
+
+if __name__ == "__main__":
+    smiles = "c1ccc(Cl)cc1"
+    result = level_function(smiles)
+    print(f"Output: {result}")

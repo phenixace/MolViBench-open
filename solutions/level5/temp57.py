@@ -3,7 +3,9 @@ from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem, Descriptors, BRICS
 from rdkit.SimDivFilters.rdSimDivPickers import MaxMinPicker
 
+
 def level_function(active_smiles_list, library_smiles_list=None, n_generate=200, n_select=50, seed=42):
+
     try:
         np.random.seed(seed)
 
@@ -12,7 +14,9 @@ def level_function(active_smiles_list, library_smiles_list=None, n_generate=200,
         if not active_mols:
             return None
 
+
         active_fps = [AllChem.GetMorganFingerprintAsBitVect(m, 2, nBits=2048) for m in active_mols]
+
 
         all_frags = set()
         for m in active_mols:
@@ -22,7 +26,10 @@ def level_function(active_smiles_list, library_smiles_list=None, n_generate=200,
         candidates = set()
         if len(all_frags) >= 2:
             try:
-                builder = BRICS.BRICSBuild(list(all_frags)[:50])
+
+                frag_mols = [Chem.MolFromSmiles(f) for f in list(all_frags)[:50]]
+                frag_mols = [m for m in frag_mols if m is not None]
+                builder = BRICS.BRICSBuild(frag_mols)
                 for i, prod in enumerate(builder):
                     if i >= n_generate:
                         break
@@ -35,6 +42,7 @@ def level_function(active_smiles_list, library_smiles_list=None, n_generate=200,
                         continue
             except Exception:
                 pass
+
 
         if library_smiles_list:
             for s in library_smiles_list:
@@ -50,6 +58,7 @@ def level_function(active_smiles_list, library_smiles_list=None, n_generate=200,
         cand_fps = [AllChem.GetMorganFingerprintAsBitVect(m, 2, nBits=2048) for m in cand_mols if m is not None]
         valid_cands = [(s, m, fp) for s, m, fp in zip(cand_list, cand_mols, cand_fps) if m is not None]
 
+
         scored = []
         for smi, mol, fp in valid_cands:
             max_sim = max(DataStructs.TanimotoSimilarity(fp, afp) for afp in active_fps)
@@ -61,8 +70,10 @@ def level_function(active_smiles_list, library_smiles_list=None, n_generate=200,
                 "mw": round(Descriptors.MolWt(mol), 2),
             })
 
+
         scored = [s for s in scored if s["max_similarity_to_actives"] >= 0.2]
         scored.sort(key=lambda x: x["max_similarity_to_actives"], reverse=True)
+
 
         top_pool = scored[:min(len(scored), n_select * 5)]
         if len(top_pool) <= n_select:
@@ -77,6 +88,7 @@ def level_function(active_smiles_list, library_smiles_list=None, n_generate=200,
             picker = MaxMinPicker()
             picks = picker.LazyPick(dist_fn, len(pool_fps), n_select, seed=seed)
             selected = [top_pool[i] for i in picks]
+
 
         if len(selected) >= 2:
             sel_fps = [AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(s["smiles"]), 2, nBits=2048) for s in selected]
@@ -101,3 +113,11 @@ def level_function(active_smiles_list, library_smiles_list=None, n_generate=200,
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    actives = ['c1ccc(NC(=O)c2ccccc2)cc1', 'c1ccc(NC(=O)c2ccncc2)cc1', 'c1ccc(NC(=O)c2ccc(F)cc2)cc1']
+    result = level_function(actives, n_select=10)
+    if result:
+        print(f"Output: {result['n_candidates_generated']}{result['n_selected']}")
+        print(f"Output: {result['avg_similarity_to_actives']}{result['internal_diversity']}")

@@ -2,34 +2,57 @@ from rdkit import Chem
 import random
 
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
-        if mol_obj is None:
-            return None
+        if mol_obj is None: return None
 
         ring_info = mol_obj.GetRingInfo()
         atom_rings = ring_info.AtomRings()
-        if not atom_rings:
-            return None
+        if not atom_rings: return None
 
-        ring = list(random.choice(list(atom_rings)))
 
-        rw = Chem.RWMol(mol_obj)
+        replacements = [6, 7, 8, 16]
 
-        target_idx = random.choice(ring)
-        orig_num = rw.GetAtomWithIdx(target_idx).GetAtomicNum()
-        candidates = [z for z in replacements if z != orig_num]
-        if not candidates:
-            return None
 
-        new_num = random.choice(candidates)
-        rw.GetAtomWithIdx(target_idx).SetAtomicNum(new_num)
+        for _ in range(10):
+            rw = Chem.RWMol(mol_obj)
 
-        try:
-            Chem.SanitizeMol(rw)
-            return Chem.MolToSmiles(rw)
-        except Exception:
-            return None
-    except Exception as e:
-        print(e)
+            ring = list(random.choice(atom_rings))
+
+            target_idx = random.choice(ring)
+            atom = rw.GetAtomWithIdx(target_idx)
+
+            orig_num = atom.GetAtomicNum()
+            candidates = [z for z in replacements if z != orig_num]
+            if not candidates: continue
+
+            new_num = random.choice(candidates)
+            atom.SetAtomicNum(new_num)
+
+
+            atom.SetFormalCharge(0)
+            atom.SetNumExplicitHs(0)
+            atom.SetNoImplicit(False)
+
+
+            atom.SetIsAromatic(False)
+
+            try:
+
+                rw.UpdatePropertyCache(strict=False)
+
+                Chem.SanitizeMol(rw, sanitizeOps=Chem.SanitizeFlags.SANITIZE_ALL)
+                return Chem.MolToSmiles(rw)
+            except:
+                continue
+
         return None
+    except Exception as e:
+        return None
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1'
+    for i in range(10):
+        res = level_function(smiles)
+        print(f'Output: {i + 1}{res}')

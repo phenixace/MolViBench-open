@@ -2,7 +2,9 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs
 from rdkit.ML.Cluster import Butina
 
+
 def level_function(smiles_list, distance_threshold=0.4):
+
     try:
         mols = []
         fps = []
@@ -17,6 +19,7 @@ def level_function(smiles_list, distance_threshold=0.4):
         if len(fps) < 2:
             return None
 
+
         n = len(fps)
         dists = []
         for i in range(1, n):
@@ -24,7 +27,9 @@ def level_function(smiles_list, distance_threshold=0.4):
                 dist = 1 - DataStructs.TanimotoSimilarity(fps[i], fps[j])
                 dists.append(dist)
 
+
         clusters = Butina.ClusterData(dists, n, distance_threshold, isDistData=True)
+
 
         mol_cluster = {}
         for cluster_id, cluster in enumerate(clusters):
@@ -42,3 +47,11 @@ def level_function(smiles_list, distance_threshold=0.4):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    library = ['c1ccccc1', 'c1ccc(O)cc1', 'c1ccc(N)cc1', 'CCCCCC', 'CCCCCCC', 'CCCCCCCC', 'c1ccncc1', 'c1ccoc1', 'c1ccsc1']
+    result = level_function(library, 0.5)
+    if result:
+        for r in result:
+            print(f"Output: {r['smiles']}{r['cluster_id']}")

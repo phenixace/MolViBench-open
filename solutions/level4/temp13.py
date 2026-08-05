@@ -4,10 +4,12 @@ from rdkit.Chem import rdFingerprintGenerator
 from rdkit import DataStructs
 
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         Chem.AssignStereochemistry(mol_obj, cleanIt=True, force=True)
         chiral_centers = Chem.FindMolChiralCenters(mol_obj)
@@ -15,6 +17,7 @@ def level_function(mol):
 
         if not has_chiral:
             return None
+
 
         enantiomer = Chem.RWMol(mol_obj)
         for atom in enantiomer.GetAtoms():
@@ -26,6 +29,7 @@ def level_function(mol):
 
         enantiomer_mol = enantiomer.GetMol()
         enantiomer_smiles = Chem.MolToSmiles(enantiomer_mol)
+
 
         fpgen = rdFingerprintGenerator.GetMorganGenerator(radius=2)
         fp1 = fpgen.GetFingerprint(mol_obj)
@@ -40,3 +44,7 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    smiles = 'C[C@H](O)CC'
+    print(f'Output: {level_function(smiles)}')

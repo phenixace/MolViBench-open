@@ -14,11 +14,47 @@ import tempfile
 import time
 import traceback
 import importlib.util
+import inspect
 from typing import Any, Optional, Tuple
 
 
 # Maximum execution time per test case (seconds)
 DEFAULT_TIMEOUT = 60
+
+
+def _seed_random_generators(seed: Optional[int]) -> None:
+    """Seed common process-global RNGs before loading/executing a solution."""
+    if seed is None:
+        return
+    import random
+    random.seed(seed)
+    try:
+        import numpy as np
+        np.random.seed(seed)
+    except Exception:
+        pass
+
+
+def _with_seed_kwarg(func: callable, args: list, kwargs: dict,
+                      seed: Optional[int]) -> dict:
+    """Pass the case seed when a function explicitly exposes a seed parameter."""
+    if seed is None or "seed" in kwargs:
+        return kwargs
+    try:
+        signature = inspect.signature(func)
+        parameter = signature.parameters.get("seed")
+        if parameter is None or parameter.kind not in (
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.KEYWORD_ONLY,
+        ):
+            return kwargs
+        if "seed" in signature.bind_partial(*args, **kwargs).arguments:
+            return kwargs
+    except (TypeError, ValueError):
+        return kwargs
+    seeded_kwargs = dict(kwargs)
+    seeded_kwargs["seed"] = seed
+    return seeded_kwargs
 
 
 def load_function_from_file(filepath: str, func_name: str = "level_function") -> Optional[callable]:
@@ -39,19 +75,14 @@ def load_function_from_file(filepath: str, func_name: str = "level_function") ->
 
 
 def execute_function_direct(filepath: str, func_name: str, args: list, kwargs: dict,
-                            timeout: int = DEFAULT_TIMEOUT) -> dict:
+                            timeout: int = DEFAULT_TIMEOUT,
+                            seed: Optional[int] = None) -> dict:
     """
     Execute a function from a file directly in-process.
-    Fast but no isolation — use for trusted solution code.
-
-    Returns:
-        {
-            "success": bool,
-            "output": Any,
-            "error": str or None,
-            "time_s": float
-        }
+    Uses threading with daemon threads — if timeout, we abandon the thread and move on.
+    The daemon thread will be killed when the main process exits.
     """
+    _seed_random_generators(seed)
     func = load_function_from_file(filepath, func_name)
     if func is None:
         return {
@@ -60,29 +91,74 @@ def execute_function_direct(filepath: str, func_name: str, args: list, kwargs: d
             "error": f"Function '{func_name}' not found in {filepath}",
             "time_s": 0.0,
         }
+    call_kwargs = _with_seed_kwarg(func, args, kwargs, seed)
+
+    import threading
+
+    result_container = [None]
+    error_container = [None]
+
+    def _run():
+        try:
+            result_container[0] = func(*args, **call_kwargs)
+        except Exception as e:
+            error_container[0] = f"{type(e).__name__}: {e}"
 
     start = time.time()
-    try:
-        output = func(*args, **kwargs)
-        elapsed = time.time() - start
-        return {
-            "success": True,
-            "output": output,
-            "error": None,
-            "time_s": round(elapsed, 4),
-        }
-    except Exception as e:
-        elapsed = time.time() - start
+    thread = threading.Thread(target=_run, daemon=True)
+    thread.start()
+    thread.join(timeout=timeout)
+    elapsed = time.time() - start
+
+    if thread.is_alive():
+        # Thread is still running — timeout. Daemon thread will die with process.
         return {
             "success": False,
             "output": None,
-            "error": f"{type(e).__name__}: {e}",
+            "error": f"Timeout after {timeout}s",
+            "time_s": round(elapsed, 4),
+            "timeout": True,
+        }
+
+    if error_container[0] is not None:
+        return {
+            "success": False,
+            "output": None,
+            "error": error_container[0],
             "time_s": round(elapsed, 4),
         }
 
+    return {
+        "success": True,
+        "output": result_container[0],
+        "error": None,
+        "time_s": round(elapsed, 4),
+    }
+
+
+def _kill_proc_tree(pid: int):
+    """Kill a process and all its children. Works on Windows and Unix."""
+    try:
+        import signal
+        if sys.platform == "win32":
+            # taskkill /T kills the entire process tree
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(pid)],
+                capture_output=True, timeout=10,
+            )
+        else:
+            os.killpg(os.getpgid(pid), signal.SIGKILL)
+    except Exception:
+        # Last resort: just kill the process itself
+        try:
+            os.kill(pid, 9)
+        except Exception:
+            pass
+
 
 def execute_function_subprocess(filepath: str, func_name: str, args: list, kwargs: dict,
-                                timeout: int = DEFAULT_TIMEOUT) -> dict:
+                                timeout: int = DEFAULT_TIMEOUT,
+                                seed: Optional[int] = None) -> dict:
     """
     Execute a function from a file in an isolated subprocess.
     Safe for untrusted LLM-generated code. Uses JSON for I/O.
@@ -102,10 +178,95 @@ def execute_function_subprocess(filepath: str, func_name: str, args: list, kwarg
     """
     # Create a wrapper script that imports and calls the function
     wrapper_code = f'''
-import sys, json, traceback, os
+import sys, json, traceback, os, inspect
+import random
+random.seed({seed!r})
+try:
+    import numpy as np
+    np.random.seed({seed!r})
+except Exception:
+    pass
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(r"{filepath}"))
+
+def smart_serialize(obj):
+    """Convert non-JSON-serializable objects to informative representations."""
+    if obj is None:
+        return None
+    if isinstance(obj, (bool, int, float, str)):
+        return obj
+    if isinstance(obj, (list, tuple)):
+        return [smart_serialize(x) for x in obj]
+    if isinstance(obj, dict):
+        return {{k: smart_serialize(v) for k, v in obj.items()}}
+    if isinstance(obj, set):
+        return sorted([smart_serialize(x) for x in obj], key=lambda x: str(x))
+    if isinstance(obj, bytes):
+        return {{"__type__": "bytes", "length": len(obj)}}
+
+    type_name = type(obj).__name__
+    module_name = type(obj).__module__ or ""
+    full_type = f"{{module_name}}.{{type_name}}" if module_name else type_name
+
+    # PIL Image
+    if "PIL" in module_name or type_name == "Image":
+        try:
+            return {{"__type__": "PIL.Image", "mode": obj.mode, "size": list(obj.size)}}
+        except Exception:
+            return {{"__type__": "PIL.Image"}}
+
+    # numpy array
+    if type_name == "ndarray":
+        try:
+            return {{"__type__": "numpy.ndarray", "shape": list(obj.shape),
+                     "dtype": str(obj.dtype), "values": obj.tolist()}}
+        except Exception:
+            return {{"__type__": "numpy.ndarray", "shape": list(obj.shape)}}
+
+    # pandas DataFrame
+    if type_name == "DataFrame":
+        try:
+            return {{"__type__": "pandas.DataFrame",
+                     "shape": list(obj.shape),
+                     "columns": list(obj.columns),
+                     "data": obj.head(20).to_dict(orient="records")}}
+        except Exception:
+            return {{"__type__": "pandas.DataFrame"}}
+
+    # pandas Series
+    if type_name == "Series":
+        try:
+            return {{"__type__": "pandas.Series",
+                     "length": len(obj),
+                     "values": obj.head(20).tolist()}}
+        except Exception:
+            return {{"__type__": "pandas.Series"}}
+
+    # RDKit Mol object
+    if "rdkit" in module_name.lower() or "Chem" in module_name:
+        try:
+            from rdkit import Chem
+            if hasattr(obj, "GetNumAtoms"):
+                smi = Chem.MolToSmiles(obj)
+                return {{"__type__": "rdkit.Mol", "smiles": smi,
+                         "num_atoms": obj.GetNumAtoms()}}
+        except Exception:
+            pass
+        return {{"__type__": full_type, "str": str(obj)[:200]}}
+
+    # RDKit enum types (BondType, HybridizationType, etc.)
+    if "rdkit" in module_name.lower():
+        try:
+            return {{"__type__": full_type, "name": obj.name if hasattr(obj, "name") else str(obj)}}
+        except Exception:
+            return {{"__type__": full_type, "str": str(obj)[:200]}}
+
+    # Fallback: try str()
+    try:
+        return {{"__type__": full_type, "str": str(obj)[:500]}}
+    except Exception:
+        return {{"__type__": full_type}}
 
 try:
     import importlib.util
@@ -137,10 +298,23 @@ if func is None:
 # Deserialize arguments
 args = json.loads(r"""{json.dumps(args, default=str)}""")
 kwargs = json.loads(r"""{json.dumps(kwargs, default=str)}""")
+if {seed!r} is not None and "seed" not in kwargs:
+    try:
+        signature = inspect.signature(func)
+        parameter = signature.parameters.get("seed")
+        bound = signature.bind_partial(*args, **kwargs)
+        if parameter is not None and parameter.kind in (
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.KEYWORD_ONLY,
+        ) and "seed" not in bound.arguments:
+            kwargs["seed"] = {seed!r}
+    except (TypeError, ValueError):
+        pass
 
 try:
     output = func(*args, **kwargs)
-    result = {{"success": True, "output": output, "error": None, "syntax_error": False, "runtime_error": False}}
+    serialized = smart_serialize(output)
+    result = {{"success": True, "output": serialized, "error": None, "syntax_error": False, "runtime_error": False}}
 except Exception as e:
     tb = traceback.format_exc()
     result = {{"success": False, "output": None, "error": f"{{type(e).__name__}}: {{e}}\\n{{tb}}", "syntax_error": False, "runtime_error": True}}
@@ -153,19 +327,48 @@ print("__RESULT__" + json.dumps(result, default=str))
         wrapper_path = f.name
 
     start = time.time()
+    proc = None
     try:
-        result = subprocess.run(
-            [sys.executable, wrapper_path],
-            capture_output=True,
+        # Use Popen + CREATE_NEW_PROCESS_GROUP on Windows so we can
+        # reliably kill the entire process tree on timeout.
+        kwargs_popen = dict(
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            timeout=timeout,
             cwd=os.path.dirname(filepath),
             env={**os.environ, "PYTHONIOENCODING": "utf-8"},
         )
-        elapsed = time.time() - start
+        if sys.platform == "win32":
+            kwargs_popen["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
 
-        stdout = result.stdout
-        stderr = result.stderr
+        proc = subprocess.Popen(
+            [sys.executable, wrapper_path],
+            **kwargs_popen,
+        )
+
+        try:
+            stdout, stderr = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            # Kill the entire process tree
+            _kill_proc_tree(proc.pid)
+            try:
+                stdout, stderr = proc.communicate(timeout=5)
+            except Exception:
+                stdout, stderr = "", ""
+            elapsed = time.time() - start
+            return {
+                "success": False,
+                "output": None,
+                "error": f"Timeout after {timeout}s",
+                "time_s": round(elapsed, 4),
+                "stdout": "",
+                "stderr": "",
+                "syntax_error": False,
+                "runtime_error": False,
+                "timeout": True,
+            }
+
+        elapsed = time.time() - start
 
         # Extract result from stdout
         result_line = None
@@ -202,19 +405,6 @@ print("__RESULT__" + json.dumps(result, default=str))
                 "timeout": False,
             }
 
-    except subprocess.TimeoutExpired:
-        elapsed = time.time() - start
-        return {
-            "success": False,
-            "output": None,
-            "error": f"Timeout after {timeout}s",
-            "time_s": round(elapsed, 4),
-            "stdout": "",
-            "stderr": "",
-            "syntax_error": False,
-            "runtime_error": False,
-            "timeout": True,
-        }
     except Exception as e:
         elapsed = time.time() - start
         return {
@@ -229,6 +419,9 @@ print("__RESULT__" + json.dumps(result, default=str))
             "timeout": False,
         }
     finally:
+        # Make sure the process is dead
+        if proc and proc.poll() is None:
+            _kill_proc_tree(proc.pid)
         try:
             os.unlink(wrapper_path)
         except OSError:

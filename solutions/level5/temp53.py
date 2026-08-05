@@ -2,18 +2,33 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, Crippen
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
+
 def level_function(mol_smiles, replacement_rings=None):
+
     try:
         mol = Chem.MolFromSmiles(mol_smiles)
         if mol is None:
             return None
 
+
         scaffold = MurckoScaffold.GetScaffoldForMol(mol)
         scaffold_smi = Chem.MolToSmiles(scaffold)
 
+
         if replacement_rings is None:
             replacement_rings = [
+                "c1ccncc1",
+                "c1ccoc1",
+                "c1ccsc1",
+                "c1cc[nH]c1",
+                "c1cnc2ccccc2n1",
+                "C1CCNCC1",
+                "C1CCOCC1",
+                "c1ccc2[nH]ccc2c1",
+                "c1cnc[nH]1",
+                "c1ccnnc1",
             ]
+
 
         orig_logp = Crippen.MolLogP(mol)
         orig_tpsa = Descriptors.TPSA(mol)
@@ -64,3 +79,11 @@ def level_function(mol_smiles, replacement_rings=None):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('c1ccc(NC(=O)C)cc1')
+    if result:
+        print(f"Output: {result['original']['scaffold']}")
+        for m in result['morphed'][:3]:
+            print(f"Output: {m['new_ring']}{m['morphed_smiles']}{m['delta_QED']}")

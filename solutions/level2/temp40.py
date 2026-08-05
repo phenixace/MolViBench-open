@@ -2,7 +2,9 @@ from rdkit import Chem
 from rdkit.Chem import rdchem
 import random
 
+
 def level_function(mol):
+
     try:
         mol = Chem.MolFromSmiles(mol)
         rwmol = Chem.RWMol(mol)
@@ -23,8 +25,14 @@ def level_function(mol):
             Chem.SanitizeMol(rwmol)
             return Chem.MolToSmiles(rwmol)
         except Exception:
+
             bond.SetBondType(current_type)
             return Chem.MolToSmiles(mol)
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    result = level_function('c1ccccc1CCO')
+    print(f'Output: {result}')

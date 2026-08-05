@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import Descriptors, AllChem
 
+
 def level_function(fragment_smiles_list, num_rounds=3):
+
     try:
         frags = []
         for smi in fragment_smiles_list:
@@ -12,6 +14,7 @@ def level_function(fragment_smiles_list, num_rounds=3):
         if not frags:
             return None
 
+
         current_mol = frags[0]
         mw_curve = [{"round": 0, "MW": round(Descriptors.MolWt(current_mol), 2),
                      "smiles": Chem.MolToSmiles(current_mol)}]
@@ -20,10 +23,13 @@ def level_function(fragment_smiles_list, num_rounds=3):
             frag_idx = round_num % len(frags)
             frag = frags[frag_idx]
 
+
             combined = Chem.CombineMols(current_mol, frag)
             rw = Chem.RWMol(combined)
 
+
             n1 = current_mol.GetNumAtoms()
+
             attached = False
             for i in range(n1):
                 atom1 = rw.GetAtomWithIdx(i)
@@ -38,12 +44,14 @@ def level_function(fragment_smiles_list, num_rounds=3):
                                 attached = True
                                 break
                             except Exception:
+
                                 rw = Chem.RWMol(combined)
                                 continue
                     if attached:
                         break
 
             if not attached:
+
                 current_mol = combined
 
             mw = Descriptors.MolWt(current_mol)
@@ -63,3 +71,12 @@ def level_function(fragment_smiles_list, num_rounds=3):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    frags = ['c1ccccc1', 'CC(=O)', 'CCO', 'CC(C)C', 'c1ccncc1']
+    result = level_function(frags, 3)
+    if result:
+        print(f"Output: {result['MW_increase']}")
+        for step in result['mw_growth_curve']:
+            print(f"Output: {step['round']}{step['MW']}")

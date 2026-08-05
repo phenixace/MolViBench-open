@@ -1,5 +1,5 @@
 """
-RDKitBench Evaluation Framework
+MolViBench Evaluation Framework
 ================================
 
 Core evaluator: orchestrates the full evaluation pipeline.
@@ -133,11 +133,14 @@ NONDETERMINISTIC_PATTERN = re.compile(
         r"\bGradientBoosting",
         r"\bKMeans\b",
         r"\bMiniBatchKMeans\b",
+        r"\bMaxMin\b",
         r"\btrain_test_split\b",
         r"\bshuffle\b",
         r"\bsample\b",
     ))
 )
+
+MULTI_SOLUTION_TASKS = frozenset({("level5", "temp36.py")})
 
 NON_COMPARABLE_CATEGORIES = frozenset({
     "mol_draw_image",
@@ -161,6 +164,12 @@ NON_COMPARABLE_DETAIL_TAGS = (
 
 def is_nondeterministic_solution(solution_path: str) -> bool:
     """Return whether the expert solution contains a stochastic construct."""
+    task_key = (
+        os.path.basename(os.path.dirname(solution_path)),
+        os.path.basename(solution_path),
+    )
+    if task_key in MULTI_SOLUTION_TASKS:
+        return True
     try:
         with open(solution_path, "r", encoding="utf-8") as handle:
             return NONDETERMINISTIC_PATTERN.search(handle.read()) is not None
@@ -511,8 +520,16 @@ def evaluate_single(solution_path: str, prediction_path: str,
     details = []
 
     for i, (args, kwargs) in enumerate(test_inputs):
+        case_seed = getattr(config, "seed", 42) + i
         # Run solution (trusted — direct execution is OK)
-        sol_result = execute_function_direct(solution_path, sol_func_name, args, kwargs, config.timeout)
+        sol_result = execute_function_direct(
+            solution_path,
+            sol_func_name,
+            args,
+            kwargs,
+            config.timeout,
+            seed=case_seed,
+        )
 
         if not sol_result["success"]:
             details.append({
@@ -525,7 +542,14 @@ def evaluate_single(solution_path: str, prediction_path: str,
         ref_output = sol_result["output"]
 
         # Run prediction (untrusted — subprocess)
-        pred_result = exec_fn(prediction_path, pred_func_name, args, kwargs, config.timeout)
+        pred_result = exec_fn(
+            prediction_path,
+            pred_func_name,
+            args,
+            kwargs,
+            config.timeout,
+            seed=case_seed,
+        )
 
         if not pred_result["success"]:
             details.append({
@@ -816,7 +840,7 @@ def evaluate_level(level: int, config: EvalConfig) -> dict:
 def evaluate_all(config: EvalConfig) -> dict:
     """Run evaluation across all levels."""
     print("=" * 60)
-    print("  RDKitBench Evaluation")
+    print("  MolViBench Evaluation")
     print(f"  Language: {config.lang} | Safe mode: {config.safe_mode}")
     print(f"  Test molecules per question: {config.n_test_molecules}")
     print("=" * 60)

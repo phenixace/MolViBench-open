@@ -2,8 +2,11 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, DataStructs, Descriptors, Lipinski
 import numpy as np
 
+
 def level_function(mols):
+
     try:
+
         ro5_mols = []
         for smi in mols:
             mol = Chem.MolFromSmiles(smi)
@@ -27,6 +30,7 @@ def level_function(mols):
         n = len(ro5_mols)
         k = min(5, n)
 
+
         X = np.array([d['fp'] for d in ro5_mols], dtype=float)
         rng = np.random.RandomState(42)
         indices = rng.choice(n, k, replace=False)
@@ -44,6 +48,7 @@ def level_function(mols):
                 if len(members) > 0:
                     centroids[j] = members.mean(axis=0)
 
+
         results = []
         for cluster_id in range(k):
             cluster_mols = [ro5_mols[i] for i in range(n) if labels[i] == cluster_id]
@@ -59,3 +64,11 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['CCO', 'c1ccccc1', 'CC(=O)O', 'c1ccncc1', 'c1ccc(O)cc1', 'CCCC', 'CCN', 'c1ccc(F)cc1', 'CC(C)CC1=CC=C(C=C1)C(C)C(=O)O']
+    result = level_function(smiles_list)
+    if result:
+        for r in result:
+            print(f"Output: {r['cluster']}{r['smiles']}{r['qed']}")

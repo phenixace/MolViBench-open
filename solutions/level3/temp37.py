@@ -1,33 +1,40 @@
 from rdkit import Chem
-from rdkit.Chem import Descriptors
 
 def level_function(mol1, mol2):
+
     try:
         m1 = Chem.MolFromSmiles(mol1)
         m2 = Chem.MolFromSmiles(mol2)
-        if m1 is None or m2 is None:
+        if m1 is None or m2 is None: return False
+
+
+        if Chem.GetFormalCharge(m1) != Chem.GetFormalCharge(m2):
             return False
 
-        formula1 = Descriptors.MolecularFormula(m1)
-        formula2 = Descriptors.MolecularFormula(m2)
-        if formula1 != formula2:
-            return False
+        def get_standardized_skeleton(mol):
 
-        for atom in m1.GetAtoms():
-            atom.SetFormalCharge(0)
-        for atom in m2.GetAtoms():
-            atom.SetFormalCharge(0)
+            new_mol = Chem.AddHs(mol)
+            rw_mol = Chem.RWMol(new_mol)
 
-        try:
-            Chem.SanitizeMol(m1)
-            Chem.SanitizeMol(m2)
-        except Exception:
-            pass
+            for atom in rw_mol.GetAtoms():
+                atom.SetFormalCharge(0)
 
-        smi1 = Chem.MolToSmiles(m1, isomericSmiles=False)
-        smi2 = Chem.MolToSmiles(m2, isomericSmiles=False)
+            for bond in rw_mol.GetBonds():
+                bond.SetBondType(Chem.rdchem.BondType.SINGLE)
 
-        return smi1 == smi2
+
+
+            return Chem.MolToSmiles(rw_mol, canonical=True)
+
+        skeleton1 = get_standardized_skeleton(m1)
+        skeleton2 = get_standardized_skeleton(m2)
+
+        return skeleton1 == skeleton2
+
     except Exception as e:
-        print(e)
+        print(f"Error: {e}")
         return False
+
+if __name__ == '__main__':
+    print(f"Output: {level_function('C=C[O-]', '[CH2-]C=O')}")
+    print(f"Output: {level_function('CC(C)=O', 'CC(C)=CO')}")

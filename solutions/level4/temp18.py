@@ -2,16 +2,19 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, rdMolDescriptors
 
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
+
 
         pattern = Chem.MolFromSmarts('[C:1]#[C:2]')
         has_alkyne = mol_obj.HasSubstructMatch(pattern)
 
         if not has_alkyne:
             return None
+
 
         rxn = AllChem.ReactionFromSmarts('[C:1]#[C:2]>>[C:1]=[C:2]')
         products = rxn.RunReactants((mol_obj,))
@@ -21,6 +24,7 @@ def level_function(mol):
         product = products[0][0]
         Chem.SanitizeMol(product)
         product_smiles = Chem.MolToSmiles(product)
+
 
         mol_wt = rdMolDescriptors.CalcExactMolWt(product)
 
@@ -32,3 +36,7 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+if __name__ == '__main__':
+    smiles = 'CC#CC'
+    print(f'Output: {level_function(smiles)}')

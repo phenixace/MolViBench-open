@@ -1,13 +1,16 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors, rdMolDescriptors
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
             return None
 
         orig_smi = Chem.MolToSmiles(mol_obj)
+
 
         rxns = [
             '[cH:1]>>[c:1]C',
@@ -35,6 +38,7 @@ def level_function(mol):
                         smi = Chem.MolToSmiles(product)
                         candidates.add(smi)
 
+
                         products2 = rxn.RunReactants((product,))
                         for ps2 in products2:
                             for p2 in ps2:
@@ -47,6 +51,7 @@ def level_function(mol):
                     except Exception:
                         continue
 
+
         scored = []
         for smi in candidates:
             m = Chem.MolFromSmiles(smi)
@@ -56,6 +61,8 @@ def level_function(mol):
             logp = Descriptors.MolLogP(m)
             tpsa = rdMolDescriptors.CalcTPSA(m)
 
+
+            logp_score = 1.0 - min(abs(logp - 2.0), 3.0) / 3.0
             tpsa_score = 1.0 if tpsa < 120 else max(0, 1.0 - (tpsa - 120) / 60.0)
             total_score = qed * 0.4 + logp_score * 0.3 + tpsa_score * 0.3
 
@@ -67,6 +74,7 @@ def level_function(mol):
                 'total_score': round(total_score, 4)
             })
 
+
         scored.sort(key=lambda x: x['total_score'], reverse=True)
 
         return {
@@ -77,3 +85,14 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1'
+    result = level_function(smiles)
+    if result:
+        print(f"Output: {result['num_candidates']}")
+        print(f"Output: {result['best_lead']}")
+        print('Output')
+        for r in result['top5']:
+            print(f"Output: {r['smiles']}{r['total_score']}{r['qed']}{r['logp']}{r['tpsa']}")

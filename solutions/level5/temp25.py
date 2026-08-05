@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
+
 def level_function(mol):
+
     try:
         mol_obj = Chem.MolFromSmiles(mol)
         if mol_obj is None:
@@ -9,10 +11,12 @@ def level_function(mol):
 
         orig_smi = Chem.MolToSmiles(mol_obj)
 
+
         ring_info = mol_obj.GetRingInfo()
         atom_rings = list(ring_info.AtomRings())
 
         derivatives = []
+
 
         stable_replacements = [(7, 'N'), (8, 'O'), (16, 'S')]
         for ring in atom_rings:
@@ -30,7 +34,7 @@ def level_function(mol):
                                 derivatives.append({
                                     'smiles': smi,
                                     'qed': round(qed, 4),
-                                    'modification': f'Ring C→{sym}'
+                                    'modification': f'Replace ring C with {sym}'
                                 })
                         except Exception:
                             continue
@@ -40,3 +44,9 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'c1ccccc1'
+    result = level_function(smiles)
+    print(f'Output: {result}')

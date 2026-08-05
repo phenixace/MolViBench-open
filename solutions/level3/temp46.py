@@ -1,13 +1,15 @@
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors
 
+
 PHARMACOPHORE_PATTERNS = {
-    "H-bond donor": "[#7H,#8H,#16H]",
-    "H-bond acceptor": "[#7,#8,#16;!H0;v2,v3,v4,v5]",
-    "Positive charge center": "[+,NH3+,NH2+,NH+]",
-    "Negative charge center": "[-,C(=O)[O-],S(=O)(=O)[O-]]",
-    "Aromatic ring": "a1aaaaa1",
-    "Hydrophobic center": "[CH2,CH3,c]",
+    "Hydrogen-bond donor": "[N,O,S;!H0]",
+    "Hydrogen-bond acceptor": "[N,O,S;!+]",
+    "Negative charge center": "[$([O-,S-,P-]),$([OH]-[C,S,P]=O)]",
+    "Positive charge center": "[+1,$([N;H2,H3])]",
+    "Five-membered aromatic ring": "a1aaaa1",
+    "Six-membered aromatic ring": "a1aaaaa1",
+    "Hydrophobic center": "[C;!$(C-[!#6])]",
     "Halogen": "[F,Cl,Br,I]",
 }
 
@@ -34,3 +36,11 @@ def level_function(mol):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles = 'CC(=O)Oc1ccccc1C(=O)O'
+    result = level_function(smiles)
+    if result:
+        for p in result:
+            print(f"Output: {p['type']}{p['count']}")

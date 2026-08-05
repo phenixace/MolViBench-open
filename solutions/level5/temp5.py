@@ -1,7 +1,9 @@
 from rdkit import Chem
 from rdkit.Chem import rdFMCS
 
+
 def level_function(mols):
+
     try:
         mol_objs = []
         for smi in mols:
@@ -12,6 +14,7 @@ def level_function(mols):
         if len(mol_objs) < 2:
             return None
 
+
         mcs_result = rdFMCS.FindMCS(
             mol_objs,
             threshold=0.8,
@@ -21,6 +24,7 @@ def level_function(mols):
         )
 
         if mcs_result.canceled:
+
             mcs_result = rdFMCS.FindMCS(
                 mol_objs,
                 threshold=0.7,
@@ -30,6 +34,7 @@ def level_function(mols):
         mcs_smarts = mcs_result.smartsString
         if not mcs_smarts:
             return None
+
 
         mcs_mol = Chem.MolFromSmarts(mcs_smarts)
         mcs_smiles = None
@@ -48,3 +53,9 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['c1ccc(CC(=O)O)cc1', 'c1ccc(CCC(=O)O)cc1', 'c1ccc(C(=O)O)cc1']
+    result = level_function(smiles_list)
+    print(f'Output: {result}')

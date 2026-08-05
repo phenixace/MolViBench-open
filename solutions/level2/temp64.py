@@ -2,8 +2,11 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 import numpy as np
 
+
 def level_function(mols):
+
     try:
+        from sklearn.manifold import TSNE
 
         fps = []
         valid_smiles = []
@@ -18,6 +21,7 @@ def level_function(mols):
             return None
 
         X = np.array(fps)
+
 
         try:
             import umap
@@ -39,3 +43,11 @@ def level_function(mols):
     except Exception as e:
         print(e)
         return None
+
+
+if __name__ == '__main__':
+    smiles_list = ['c1ccccc1', 'CCO', 'CC(=O)O', 'c1ccc(O)cc1', 'CCCC', 'CC(C)C', 'c1ccncc1', 'CC=O', 'CCC(=O)O', 'CCCCO']
+    result = level_function(smiles_list)
+    if result:
+        for r in result[:3]:
+            print('Output:', r)
